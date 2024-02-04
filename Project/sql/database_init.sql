@@ -14,7 +14,7 @@ create table if not exists Appointments (
 	id serial primary key not null,
 	user_id int,
 	doctor_id int,
-	appointment_date Date not null,
+	appointment_date timestamp not null,
 	creation_date Date default now(),
 	payment_status payment_status not null,
 	payment_amount int not null,
