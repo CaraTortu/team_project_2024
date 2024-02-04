@@ -6,7 +6,6 @@
   <packaging>jar</packaging>
   <version>0.1</version>
   <name>gp-system</name>
-  <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -18,5 +17,32 @@
   <properties>
      <maven.compiler.source>17</maven.compiler.source>
      <maven.compiler.target>17</maven.compiler.target>
-   </properties>
+     <start-class>ie.teamproject.gp.App</start-class>
+  </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>ie.teamproject.gp.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+    </plugin>
+    </plugins>
+  </build>
 </project>

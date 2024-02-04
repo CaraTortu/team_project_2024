@@ -3,7 +3,7 @@
 # Build the JAR file
 cd gp-system
 mvn package
-mv target/*.jar ../docker_files
+mv target/*.jar ../docker_files/gp-system.jar
 
 # Compile the docker image
 cd ..

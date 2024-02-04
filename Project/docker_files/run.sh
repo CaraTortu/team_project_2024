@@ -6,4 +6,4 @@ if [ ! -e /opt/app/*.jar ]
         exit
 fi
 
-java -cp /opt/app/gp-system-0.1.jar ie.teamproject.gp.App
+java -jar /opt/app/gp-system.jar
