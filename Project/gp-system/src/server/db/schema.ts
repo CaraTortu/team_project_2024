@@ -18,7 +18,11 @@ import { type AdapterAccount } from "next-auth/adapters";
 export const createTable = pgTableCreator((name) => `gp-system_${name}`);
 
 export const userTypeEnum = pgEnum("userType", ["doctor", "frontdesk", "user"]);
-export const paymentStatus = pgEnum("paymentStatus", ["complete", "failed", "pending"]);
+export const paymentStatus = pgEnum("paymentStatus", [
+    "complete",
+    "failed",
+    "pending",
+]);
 
 export const users = createTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
@@ -27,14 +31,16 @@ export const users = createTable("user", {
     emailVerified: timestamp("emailVerified", {
         mode: "date",
     }).default(sql`CURRENT_TIMESTAMP`),
+    password: varchar("password", { length: 255 }),
     image: varchar("image", { length: 255 }),
-    usertype: userTypeEnum("userType").default("user"),
-    doctorId: varchar("doctorId", { length: 255 }).default(sql`NULL`)
+    userType: userTypeEnum("userType").default("user"),
+    doctorId: varchar("doctorId", { length: 255 }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-    accounts: many(accounts),
-    appointments: many(appointment)
+    accounts: many(accounts, { relationName: "accounts" }),
+    user_appointments: many(appointment, { relationName: "user" }),
+    doctor_appointments: many(appointment, { relationName: "doctor" }),
 }));
 
 export const accounts = createTable(
@@ -67,7 +73,7 @@ export const accounts = createTable(
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
-    user: one(users, { fields: [accounts.userId], references: [users.id] }),
+    user: one(users, { fields: [accounts.userId], references: [users.id], relationName: "accounts" }),
 }));
 
 export const sessions = createTable(
@@ -102,7 +108,6 @@ export const verificationTokens = createTable(
     }),
 );
 
-
 export const appointment = createTable("appointment", {
     id: serial("id").primaryKey(),
     userId: varchar("userId", { length: 255 })
@@ -121,7 +126,15 @@ export const appointment = createTable("appointment", {
     createdAt: timestamp("created_at")
         .default(sql`CURRENT_TIMESTAMP`)
         .notNull(),
-});
+    }, (appointment) => ({
+        userIdIdx: index("appointment_userId_idx").on(appointment.userId),
+        doctorIdIdx: index("appointment_doctorId_idx").on(appointment.doctorId),
+    })
+);
 
+export const appointmentRelations = relations(appointment, ({ one }) => ({
+    user: one(users, { relationName: "user", fields: [appointment.userId], references: [users.id] }),
+    doctor: one(users, { relationName: "doctor", fields: [appointment.doctorId], references: [users.id] }),
+}));
 
 
