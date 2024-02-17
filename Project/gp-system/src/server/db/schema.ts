@@ -33,7 +33,7 @@ export const users = createTable("user", {
     }).default(sql`CURRENT_TIMESTAMP`),
     password: varchar("password", { length: 255 }),
     image: varchar("image", { length: 255 }),
-    userType: userTypeEnum("userType").default("user"),
+    userType: userTypeEnum("userType").default("user").notNull(),
     doctorId: varchar("doctorId", { length: 255 }),
 });
 

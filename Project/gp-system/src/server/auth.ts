@@ -1,4 +1,5 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { eq } from "drizzle-orm";
 import {
     getServerSession,
     type DefaultSession,
@@ -11,7 +12,7 @@ import DiscordProvider from "next-auth/providers/discord";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
-import { createTable } from "~/server/db/schema";
+import { createTable, users } from "~/server/db/schema";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -35,7 +36,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
     /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
     interface JWT extends DefaultJWT {
-       user?: User 
+        userType?: string
     }
 }
             
@@ -47,18 +48,20 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt"
     }, 
     callbacks: {
-        session: async ({ session, token }) => {
-            if (token) {
-                session.token = token
+        session: async ({ session, token }) => ({
+            ...session,
+            user: {
+                ...session.user,
+                id: token.sub,
+                userType: token.userType,
             }
-
-            return session
-        },
-        jwt: async ({ token, user }) => {
-            if (user) {
-                token.user = user
-            }
-
+        }),
+        jwt: async ({ token }) => {
+            token.userType = (await db.select({userType: users.userType})
+                    .from(users)
+                    .where(eq(users.id, token.sub ?? ""))
+                    .execute())[0]?.userType ?? "";
+    
             return token
         }
     },
