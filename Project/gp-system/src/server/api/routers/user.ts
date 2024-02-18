@@ -30,7 +30,7 @@ export const userRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            ctx.db.insert(users).values({
+            await ctx.db.insert(users).values({
                 id: randomString(255),
                 email: input.email,
                 name: input.name,

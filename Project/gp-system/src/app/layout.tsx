@@ -1,11 +1,12 @@
 import "~/styles/globals.css";
 
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
-const inter = Inter({
+const roboto = Roboto({
     subsets: ["latin"],
+    weight: ["100", "300", "400", "500", "700", "900"],
     variable: "--font-sans",
 });
 
@@ -22,7 +23,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`font-sans ${inter.variable}`}>
+            <body className={`font-sans ${roboto.variable}`}>
                 <TRPCReactProvider>{children}</TRPCReactProvider>
             </body>
         </html>

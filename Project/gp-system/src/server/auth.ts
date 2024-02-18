@@ -4,10 +4,10 @@ import {
     getServerSession,
     type DefaultSession,
     type NextAuthOptions,
-    DefaultUser,
+    type DefaultUser,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import { DefaultJWT, JWT } from "next-auth/jwt";
+import { type DefaultJWT, type JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import DiscordProvider from "next-auth/providers/discord";
 import { z } from "zod";
@@ -107,8 +107,7 @@ export const authOptions: NextAuthOptions = {
                 });
 
                 if (
-                    !databaseCredentials ||
-                    !databaseCredentials.password ||
+                    !databaseCredentials?.password ||
                     !bcrypt.compareSync(
                         parsedCreds.data.password,
                         databaseCredentials.password,
@@ -122,7 +121,7 @@ export const authOptions: NextAuthOptions = {
                     name: databaseCredentials.name,
                     email: databaseCredentials.email,
                     userType: databaseCredentials.userType,
-                    image: databaseCredentials.image
+                    image: databaseCredentials.image,
                 };
             },
         }),
