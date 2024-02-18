@@ -4,15 +4,18 @@ import {
     getServerSession,
     type DefaultSession,
     type NextAuthOptions,
-    User,
+    DefaultUser,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import { DefaultJWT, JWT } from "next-auth/jwt";
+import Credentials from "next-auth/providers/credentials";
 import DiscordProvider from "next-auth/providers/discord";
+import { z } from "zod";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable, users } from "~/server/db/schema";
+import bcrypt from "bcrypt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -22,31 +25,28 @@ import { createTable, users } from "~/server/db/schema";
  */
 declare module "next-auth" {
     interface Session extends DefaultSession {
-        token?: JWT
+        token?: JWT;
     }
 
-    interface User {
-        id?: string,
-        name?: string,
-        email?: string,
-        userType?: string,
+    interface User extends DefaultUser {
+        userType?: string;
     }
 }
 
 declare module "next-auth/jwt" {
     /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
     interface JWT extends DefaultJWT {
-        userType?: string
+        userType?: string;
     }
 }
-            
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  */
 export const authOptions: NextAuthOptions = {
     session: {
-        strategy: "jwt"
-    }, 
+        strategy: "jwt",
+    },
     callbacks: {
         session: async ({ session, token }) => ({
             ...session,
@@ -54,26 +54,78 @@ export const authOptions: NextAuthOptions = {
                 ...session.user,
                 id: token.sub,
                 userType: token.userType,
-            }
+            },
         }),
         jwt: async ({ token }) => {
-            token.userType = (await db.select({userType: users.userType})
-                    .from(users)
-                    .where(eq(users.id, token.sub ?? ""))
-                    .execute())[0]?.userType ?? "";
-    
-            return token
-        }
+            if (!token.sub) {
+                console.error(`ERROR: Token.sub does not exist.`);
+                return {};
+            }
+
+            const query = await db.query.users.findFirst({
+                columns: {
+                    userType: true,
+                },
+                where: eq(users.id, token.sub),
+            });
+
+            token.userType = query?.userType;
+            return token;
+        },
     },
     adapter: DrizzleAdapter(db, createTable) as Adapter,
     providers: [
         DiscordProvider({
+            id: "discord",
             clientId: env.DISCORD_CLIENT_ID,
             clientSecret: env.DISCORD_CLIENT_SECRET,
         }),
-        /**
-         * ...add more providers here.
-         */
+        Credentials({
+            id: "credentials",
+            name: "Username and Password",
+
+            credentials: {
+                email: {
+                    label: "email",
+                    type: "email",
+                    placeholder: "john.doe@example.com",
+                },
+                password: { label: "Password", type: "pasword" },
+            },
+
+            authorize: async (credentials, _req) => {
+                const parsedCreds = z
+                    .object({ email: z.string().email(), password: z.string() })
+                    .safeParse(credentials);
+
+                if (!parsedCreds.success) {
+                    return null;
+                }
+
+                const databaseCredentials = await db.query.users.findFirst({
+                    where: eq(users.email, parsedCreds.data.email),
+                });
+
+                if (
+                    !databaseCredentials ||
+                    !databaseCredentials.password ||
+                    !bcrypt.compareSync(
+                        parsedCreds.data.password,
+                        databaseCredentials.password,
+                    )
+                ) {
+                    return null;
+                }
+
+                return {
+                    id: databaseCredentials.id,
+                    name: databaseCredentials.name,
+                    email: databaseCredentials.email,
+                    userType: databaseCredentials.userType,
+                    image: databaseCredentials.image
+                };
+            },
+        }),
     ],
 };
 

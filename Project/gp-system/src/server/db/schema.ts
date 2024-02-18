@@ -73,7 +73,11 @@ export const accounts = createTable(
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
-    user: one(users, { fields: [accounts.userId], references: [users.id], relationName: "accounts" }),
+    user: one(users, {
+        fields: [accounts.userId],
+        references: [users.id],
+        relationName: "accounts",
+    }),
 }));
 
 export const sessions = createTable(
@@ -108,33 +112,42 @@ export const verificationTokens = createTable(
     }),
 );
 
-export const appointment = createTable("appointment", {
-    id: serial("id").primaryKey(),
-    userId: varchar("userId", { length: 255 })
-        .references(() => users.id)
-        .notNull(),
-    doctorId: varchar("doctorId", { length: 255 })
-        .references(() => users.id)
-        .notNull(),
-    createdById: varchar("createdById", { length: 255 })
-        .notNull()
-        .references(() => users.id),
-    appointmentDate: date("appointmentDate").notNull(),
-    paymentAmount: real("paymentAmount"),
-    paymentStatus: paymentStatus("paymentStatus").default("pending"),
-    isCancelled: boolean("isCancelled").default(false),
-    createdAt: timestamp("created_at")
-        .default(sql`CURRENT_TIMESTAMP`)
-        .notNull(),
-    }, (appointment) => ({
+export const appointment = createTable(
+    "appointment",
+    {
+        id: serial("id").primaryKey(),
+        userId: varchar("userId", { length: 255 })
+            .references(() => users.id)
+            .notNull(),
+        doctorId: varchar("doctorId", { length: 255 })
+            .references(() => users.id)
+            .notNull(),
+        createdById: varchar("createdById", { length: 255 })
+            .notNull()
+            .references(() => users.id),
+        appointmentDate: date("appointmentDate").notNull(),
+        paymentAmount: real("paymentAmount"),
+        paymentStatus: paymentStatus("paymentStatus").default("pending"),
+        isCancelled: boolean("isCancelled").default(false),
+        createdAt: timestamp("created_at")
+            .default(sql`CURRENT_TIMESTAMP`)
+            .notNull(),
+    },
+    (appointment) => ({
         userIdIdx: index("appointment_userId_idx").on(appointment.userId),
         doctorIdIdx: index("appointment_doctorId_idx").on(appointment.doctorId),
-    })
+    }),
 );
 
 export const appointmentRelations = relations(appointment, ({ one }) => ({
-    user: one(users, { relationName: "user", fields: [appointment.userId], references: [users.id] }),
-    doctor: one(users, { relationName: "doctor", fields: [appointment.doctorId], references: [users.id] }),
+    user: one(users, {
+        relationName: "user",
+        fields: [appointment.userId],
+        references: [users.id],
+    }),
+    doctor: one(users, {
+        relationName: "doctor",
+        fields: [appointment.doctorId],
+        references: [users.id],
+    }),
 }));
-
-
