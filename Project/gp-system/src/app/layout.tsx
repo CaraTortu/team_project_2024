@@ -1,8 +1,8 @@
 import "~/styles/globals.css";
 
 import { Roboto } from "next/font/google";
-
 import { TRPCReactProvider } from "~/trpc/react";
+import { Toaster } from "react-hot-toast";
 
 const roboto = Roboto({
     subsets: ["latin"],
@@ -24,7 +24,10 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`font-sans ${roboto.variable}`}>
-                <TRPCReactProvider>{children}</TRPCReactProvider>
+                <TRPCReactProvider>
+                    <Toaster position="top-center" />
+                    {children}
+                </TRPCReactProvider>
             </body>
         </html>
     );
