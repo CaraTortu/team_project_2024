@@ -8,7 +8,7 @@ export default async function Home() {
     noStore();
     const session = await getServerAuthSession();
 
-    if (session) await api.appointment.getAppointments.query();
+    if (session) console.log(await api.appointment.getAppointments.query());
 
     return (
         <main className="flex min-h-screen flex-col bg-gradient-to-b from-gp-900 to-gp-600 text-white">

@@ -2,12 +2,11 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
 import {
     getServerSession,
-    type DefaultSession,
     type NextAuthOptions,
+    type DefaultSession,
     type DefaultUser,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
-import { type DefaultJWT, type JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import DiscordProvider from "next-auth/providers/discord";
 import { z } from "zod";
@@ -16,6 +15,7 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable, users } from "~/server/db/schema";
 import bcrypt from "bcrypt";
+import { type JWT } from "next-auth/jwt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -23,19 +23,14 @@ import bcrypt from "bcrypt";
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
+
 declare module "next-auth" {
     interface Session extends DefaultSession {
         token?: JWT;
+        user?: User;
     }
 
     interface User extends DefaultUser {
-        userType?: string;
-    }
-}
-
-declare module "next-auth/jwt" {
-    /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-    interface JWT extends DefaultJWT {
         userType?: string;
     }
 }
@@ -48,28 +43,25 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
     callbacks: {
-        session: async ({ session, token }) => ({
-            ...session,
-            user: {
-                ...session.user,
-                id: token.sub,
-                userType: token.userType,
-            },
-        }),
-        jwt: async ({ token }) => {
-            if (!token.sub) {
-                console.error(`ERROR: Token.sub does not exist.`);
-                return {};
-            }
-
+        session: async ({ session, token }) => {
             const query = await db.query.users.findFirst({
                 columns: {
                     userType: true,
                 },
-                where: eq(users.id, token.sub),
+                where: eq(users.id, token.sub ?? ""),
             });
 
-            token.userType = query?.userType;
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    id: token.sub,
+                    userType: query?.userType,
+                },
+            };
+        },
+
+        jwt: async ({ token }) => {
             return token;
         },
     },
