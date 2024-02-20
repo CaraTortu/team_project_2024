@@ -28,20 +28,25 @@ export const appointmentRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (ctx.session.user.userType === "user" && input.patientId) {
-                return {
-                    success: false,
-                    reason: "You don't have permissions to do this'",
-                };
-            }
+            const patientId =
+                ctx.session.user.id == "user"
+                    ? ctx.session.user.id
+                    : input.patientId;
 
-            const patientId = input.patientId ?? ctx.session.user.id;
+            if (!patientId) {
+                return {success: false, reason: "Please supply a patient ID"}
+            }
+    
             const doctorId = await db.query.users
                 .findFirst({
                     where: eq(users.id, patientId),
                 })
                 .execute()
                 .then((user) => user?.doctorId);
+
+            if (!doctorId) {
+                return { success: false, reason: "Could not find a doctorId assigned to this patient" }
+            }
 
             // TODO: Check the appointment is free
             // TODO: Verify date and time
@@ -51,12 +56,12 @@ export const appointmentRouter = createTRPCRouter({
                 .insert(appointment)
                 .values({
                     userId: patientId,
-                    doctorId: doctorId ?? "",
+                    doctorId: doctorId,
                     createdById:
                         ctx.session.user.userType === "doctor"
                             ? doctorId
                             : patientId,
-                    appointmentDate: input.appointmentDate,
+                    appointmentDate: input.appointmentDate.toDateString(),
                     paymentAmount: 60,
                 })
                 .execute();
