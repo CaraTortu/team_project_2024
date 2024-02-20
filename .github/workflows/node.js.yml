@@ -20,4 +20,4 @@ jobs:
       run: npm i
     - name: Build
       working-directory: ./Project/gp-system
-      run: npm run build 
+      run: cp .env.example .env && npm run build 
