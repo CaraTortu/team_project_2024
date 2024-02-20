@@ -9,6 +9,12 @@ export default async function Home() {
     const session = await getServerAuthSession();
 
     if (session) console.log(await api.appointment.getAppointments.query());
+    if (session)
+        console.log(
+            await api.appointment.createAppointment.mutate({
+                appointmentDate: new Date(),
+            }),
+        );
 
     return (
         <main className="flex min-h-screen flex-col bg-gradient-to-b from-gp-900 to-gp-600 text-white">
