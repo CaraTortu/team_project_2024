@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import { Button } from "./ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export interface AppointmentProps {

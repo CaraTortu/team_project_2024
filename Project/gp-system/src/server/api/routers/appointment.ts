@@ -66,8 +66,8 @@ export const appointmentRouter = createTRPCRouter({
                 )
                 .execute();
             
-            for (let i = 0; i < appointmentsBooked.length; i++) {
-                console.log(appointmentsBooked[i]?.appointmentDate)                   
+            for (const appointment of appointmentsBooked) {
+                console.log(appointment.appointmentDate)                   
             }
             return { success: true, data: appointmentsBooked}
         }),

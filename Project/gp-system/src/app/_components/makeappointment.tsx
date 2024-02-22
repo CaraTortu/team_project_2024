@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Session } from "next-auth";
+import React, { useState } from "react";
+import { type Session } from "next-auth";
 import { Calendar } from "./ui/calendar";
 import { Button } from "./ui/button";
 import { api } from "~/trpc/react";
@@ -9,11 +9,11 @@ export interface AppointmentProps {
     session?: Session | null;
 }
 
-const MakeAppointment: React.FC<AppointmentProps> = ({ session }) => {
+const MakeAppointment: React.FC<AppointmentProps> = ({ session: _ }) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     let availableAppointments = null;
 
-    if (date) availableAppointments = api.appointment.getAvailableAppointments.useQuery({ day: date! })
+    if (date) availableAppointments = api.appointment.getAvailableAppointments.useQuery({ day: date })
     console.log(availableAppointments?.data?.data)
 
     return (
