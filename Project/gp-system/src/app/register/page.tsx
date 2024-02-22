@@ -34,7 +34,7 @@ export default function Home() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gp-900 to-gp-600 text-white">
+        <main className="from-gp-900 to-gp-600 flex min-h-screen flex-col items-center justify-center bg-gradient-to-b text-white">
             <form
                 action={register}
                 className="flex w-[90%] flex-col items-center gap-2 rounded-lg bg-white/80 p-4 text-gray-900 md:w-[60%] lg:w-[35%]"
@@ -90,7 +90,7 @@ export default function Home() {
 
                 <button
                     type="submit"
-                    className="mt-6 rounded-xl bg-gp-500 px-2 py-1 text-white duration-300 hover:bg-gp-600 hover:px-4"
+                    className="bg-gp-500 hover:bg-gp-600 mt-6 rounded-xl px-2 py-1 text-white duration-300 hover:px-4"
                 >
                     Register
                 </button>

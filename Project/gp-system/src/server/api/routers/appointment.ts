@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { eq } from "drizzle-orm";
+import { eq, and, gt, lt } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { appointment, users } from "~/server/db/schema";
@@ -20,6 +20,57 @@ export const appointmentRouter = createTRPCRouter({
             .leftJoin(users, eq(users.id, appointment.doctorId))
             .execute();
     }),
+    getAvailableAppointments: protectedProcedure
+        .input(z.object({ day: z.date() }))
+        .query(async ({ ctx: { session }, input }) => {
+            /*if (input.day < new Date()) {
+                return {
+                    success: false,
+                    reason: "You can't get appointments from the past",
+                };
+            }*/
+
+            const startDate = new Date(
+                input.day.getFullYear(),
+                input.day.getMonth(),
+                input.day.getDate()-1,
+            );
+            const endDate = new Date(
+                input.day.getFullYear(),
+                input.day.getMonth(),
+                input.day.getDate() + 1,
+            );
+
+            const userDoctor = await db.query.users
+                .findFirst({ where: eq(users.id, session.user.id) })
+                .then((r) => r?.doctorId);
+
+            if (!userDoctor) {
+                return { success: false, reason: "You have not set your GP" };
+            }
+
+            const appointmentsBooked = await db
+                .select({
+                    appointmentDate: appointment.appointmentDate
+                })
+                .from(appointment)
+                .where(
+                    and(
+                        eq(appointment.isCancelled, false),
+                        gt(
+                            appointment.appointmentDate,
+                            startDate.toDateString(),
+                        ),
+                        lt(appointment.appointmentDate, endDate.toDateString()),
+                    ),
+                )
+                .execute();
+            
+            for (let i = 0; i < appointmentsBooked.length; i++) {
+                console.log(appointmentsBooked[i]?.appointmentDate)                   
+            }
+            return { success: true, data: appointmentsBooked}
+        }),
     createAppointment: protectedProcedure
         .input(
             z.object({
@@ -34,9 +85,9 @@ export const appointmentRouter = createTRPCRouter({
                     : input.patientId;
 
             if (!patientId) {
-                return {success: false, reason: "Please supply a patient ID"}
+                return { success: false, reason: "Please supply a patient ID" };
             }
-    
+
             const doctorId = await db.query.users
                 .findFirst({
                     where: eq(users.id, patientId),
@@ -45,7 +96,10 @@ export const appointmentRouter = createTRPCRouter({
                 .then((user) => user?.doctorId);
 
             if (!doctorId) {
-                return { success: false, reason: "Could not find a doctorId assigned to this patient" }
+                return {
+                    success: false,
+                    reason: "Could not find a doctorId assigned to this patient",
+                };
             }
 
             // TODO: Check the appointment is free
