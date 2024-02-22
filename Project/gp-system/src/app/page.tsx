@@ -6,7 +6,7 @@ import { NavBar } from "~/app/_components/navbar";
 export default async function Home() {
     noStore();
     const session = await getServerAuthSession();
- 
+     
     return (
         <main className="from-gp-900 to-gp-600 flex min-h-screen flex-col bg-gradient-to-b text-white">
             <div className="flex flex-col items-center justify-center gap-4">
