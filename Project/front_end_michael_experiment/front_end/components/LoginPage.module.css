@@ -1,0 +1,78 @@
+/* LoginPage.module.css */
+.loginContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+  }
+  
+  .loginForm {
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+  }
+  
+  .loginTitle {
+    margin-bottom: 20px;
+  }
+  
+  .inputField {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  
+  .loginButton {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .socialButton {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .google {
+    background-color: #db4437;
+  }
+  
+  .apple {
+    background-color: #000000;
+  }
+  
+  .facebook {
+    background-color: #4267b2;
+  }
+  
+  .divider {
+    color: #aaa;
+    margin: 20px 0;
+  }
+  
+  .registerPrompt {
+    margin-top: 20px;
+  }
+  
+  .registerLink {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
