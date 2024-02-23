@@ -23,17 +23,11 @@ export const appointmentRouter = createTRPCRouter({
     getAvailableAppointments: protectedProcedure
         .input(z.object({ day: z.date() }))
         .query(async ({ ctx: { session }, input }) => {
-            /*if (input.day < new Date()) {
-                return {
-                    success: false,
-                    reason: "You can't get appointments from the past",
-                };
-            }*/
 
             const startDate = new Date(
                 input.day.getFullYear(),
                 input.day.getMonth(),
-                input.day.getDate()-1,
+                input.day.getDate() - 1,
             );
             const endDate = new Date(
                 input.day.getFullYear(),
@@ -51,7 +45,7 @@ export const appointmentRouter = createTRPCRouter({
 
             const appointmentsBooked = await db
                 .select({
-                    appointmentDate: appointment.appointmentDate
+                    appointmentDate: appointment.appointmentDate,
                 })
                 .from(appointment)
                 .where(
@@ -64,12 +58,38 @@ export const appointmentRouter = createTRPCRouter({
                         lt(appointment.appointmentDate, endDate.toDateString()),
                     ),
                 )
-                .execute();
-            
-            for (const appointment of appointmentsBooked) {
-                console.log(appointment.appointmentDate)                   
+                .execute()
+                .then((appointments) =>
+                    appointments.map((p) =>
+                        new Date(p.appointmentDate).toUTCString(),
+                    ),
+                );
+
+            const latestDate = new Date(
+                input.day.getFullYear(),
+                input.day.getMonth(),
+                input.day.getDate(),
+                9, 0, 0
+            );
+
+            // TODO: retrieve the latest time each person will work.
+            endDate.setHours(18);
+            endDate.setDate(endDate.getDate() - 1);
+            let availableAppointments = [];
+            while (latestDate <= endDate) {
+                availableAppointments.push(new Date(latestDate.getTime()));
+                latestDate.setMinutes(latestDate.getMinutes() + 30);
             }
-            return { success: true, data: appointmentsBooked}
+
+            const freeAppointments = new Map();
+            availableAppointments.map((appointment) => {
+                freeAppointments.set(
+                    appointment.toUTCString(),
+                    !appointmentsBooked.includes(appointment.toUTCString()),
+                );
+            });
+
+            return { success: true, data: freeAppointments };
         }),
     createAppointment: protectedProcedure
         .input(

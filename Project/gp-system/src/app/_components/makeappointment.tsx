@@ -13,8 +13,10 @@ const MakeAppointment: React.FC<AppointmentProps> = ({ session: _ }) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     let availableAppointments = null;
 
-    if (date) availableAppointments = api.appointment.getAvailableAppointments.useQuery({ day: date })
-    console.log(availableAppointments?.data?.data)
+    if (date)
+        availableAppointments =
+            api.appointment.getAvailableAppointments.useQuery({ day: date });
+    console.log(availableAppointments?.data?.data);
 
     return (
         <div className="flex flex-col items-center gap-2">

@@ -26,7 +26,10 @@ export const paymentStatus = pgEnum("paymentStatus", [
 
 export const users = createTable("user", {
     id: varchar("id", { length: 255 }).notNull().primaryKey(),
-    name: varchar("name", { length: 255 }),
+    title: varchar("title", { length: 32 }),
+    firstName: varchar("firstName", { length: 64 }),
+    lastName: varchar("lastName", { length: 64 }),
+    name: varchar("fullName", { length: 255 }),
     email: varchar("email", { length: 255 }).notNull(),
     emailVerified: timestamp("emailVerified", {
         mode: "date",
@@ -125,7 +128,7 @@ export const appointment = createTable(
         createdById: varchar("createdById", { length: 255 })
             .notNull()
             .references(() => users.id),
-        appointmentDate: date("appointmentDate").notNull(),
+        appointmentDate: timestamp("appointmentDate").notNull(),
         paymentAmount: real("paymentAmount"),
         paymentStatus: paymentStatus("paymentStatus").default("pending"),
         isCancelled: boolean("isCancelled").default(false),
