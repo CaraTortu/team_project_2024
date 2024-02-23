@@ -16,6 +16,12 @@ if ! [ -x "$(command -v docker)" ]; then
   exit 1
 fi
 
+if ! [ -x "$(command -v npx)" ]; then
+  echo "Npm is not installed. Please install node.js and try again.\nNode.js install guide: https://nodejs.org/en/download"
+  exit 1
+fi
+
+
 if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
   docker start $DB_CONTAINER_NAME
   echo "Database container started"
@@ -43,4 +49,9 @@ DB_PASSWORD=$(echo $DATABASE_URL | awk -F':' '{print $3}' | awk -F'@' '{print $1
 
 docker run --name $DB_CONTAINER_NAME -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGRES_DB=gp_system -d -p 5432:5432 docker.io/postgres
 
-echo "Database container was succesfuly created"
+echo "Database container was succesfuly created... Pushing schema"
+
+cd gp-system
+npx drizzle-kit push:pg
+
+echo "Database schema has been pushed to the container"
