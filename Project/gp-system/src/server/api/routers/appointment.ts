@@ -23,7 +23,6 @@ export const appointmentRouter = createTRPCRouter({
     getAvailableAppointments: protectedProcedure
         .input(z.object({ day: z.date() }))
         .query(async ({ ctx: { session }, input }) => {
-
             const startDate = new Date(
                 input.day.getFullYear(),
                 input.day.getMonth(),
@@ -50,12 +49,11 @@ export const appointmentRouter = createTRPCRouter({
                 .from(appointment)
                 .where(
                     and(
-                        eq(appointment.isCancelled, false),
-                        gt(
-                            appointment.appointmentDate,
-                            startDate.toDateString(),
+                        and(
+                            eq(appointment.isCancelled, false),
+                            gt(appointment.appointmentDate, startDate),
                         ),
-                        lt(appointment.appointmentDate, endDate.toDateString()),
+                        lt(appointment.appointmentDate, endDate),
                     ),
                 )
                 .execute()
@@ -69,13 +67,15 @@ export const appointmentRouter = createTRPCRouter({
                 input.day.getFullYear(),
                 input.day.getMonth(),
                 input.day.getDate(),
-                9, 0, 0
+                9,
+                0,
+                0,
             );
 
             // TODO: retrieve the latest time each person will work.
             endDate.setHours(18);
             endDate.setDate(endDate.getDate() - 1);
-            let availableAppointments = [];
+            const availableAppointments = [];
             while (latestDate <= endDate) {
                 availableAppointments.push(new Date(latestDate.getTime()));
                 latestDate.setMinutes(latestDate.getMinutes() + 30);
@@ -135,7 +135,7 @@ export const appointmentRouter = createTRPCRouter({
                         ctx.session.user.userType === "doctor"
                             ? doctorId
                             : patientId,
-                    appointmentDate: input.appointmentDate.toDateString(),
+                    appointmentDate: input.appointmentDate,
                     paymentAmount: 60,
                 })
                 .execute();

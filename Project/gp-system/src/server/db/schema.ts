@@ -1,7 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
     boolean,
-    date,
     index,
     integer,
     pgEnum,
@@ -128,7 +127,9 @@ export const appointment = createTable(
         createdById: varchar("createdById", { length: 255 })
             .notNull()
             .references(() => users.id),
-        appointmentDate: timestamp("appointmentDate").notNull(),
+        appointmentDate: timestamp("appointmentDate", {
+            mode: "date",
+        }).notNull(),
         paymentAmount: real("paymentAmount"),
         paymentStatus: paymentStatus("paymentStatus").default("pending"),
         isCancelled: boolean("isCancelled").default(false),
