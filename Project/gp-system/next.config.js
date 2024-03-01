@@ -8,7 +8,12 @@ await import("./src/env.js");
 const config = {
     output: "standalone",
     reactStrictMode: true,
-    swcMinify: true
+    swcMinify: true,
+    images: {
+        remotePatterns: [{
+            hostname: "cdn.builder.io"
+        }]
+    }
 };
 
 export default config;
