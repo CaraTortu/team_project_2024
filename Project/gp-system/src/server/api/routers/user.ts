@@ -10,9 +10,11 @@ export const userRouter = createTRPCRouter({
     registerUser: publicProcedure
         .input(
             z.object({
-                name: z.string().max(255).min(3),
+                title: z.string().max(255).min(2),
+                fname: z.string().max(255).min(3),
+                lname: z.string().max(255).min(3),
                 email: z.string().email().max(255),
-                password: z.string().min(8),
+                password: z.string().min(8)
             }),
         )
         .mutation(async ({ ctx, input }) => {
@@ -27,8 +29,11 @@ export const userRouter = createTRPCRouter({
 
             await ctx.db.insert(users).values({
                 id: randomString(255),
+                title: input.title,
+                firstName: input.fname,
+                lastName: input.lname,
                 email: input.email,
-                name: input.name,
+                name: `${input.title} ${input.fname} ${input.lname}`,
                 password: bcrypt.hashSync(input.password, 5),
                 emailVerified: null,
             });
