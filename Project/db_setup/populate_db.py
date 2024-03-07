@@ -5,6 +5,10 @@ import string
 from dotenv import dotenv_values
 from datetime import datetime
 import bcrypt
+import requests
+
+FIRST_NAMES = requests.get("https://www.randomlists.com/data/names-first.json").json()["data"]
+LAST_NAMES = requests.get("https://www.randomlists.com/data/names-surnames.json").json()["data"]
 
 # Parse the URL
 config = dotenv_values("../gp-system/.env")
@@ -33,13 +37,13 @@ def random_id():
 
 def create_doctor():
     doctor_id = random_id()
-    full_name = random.choice(["Dr John Doe", "Dr Jane Smith", "Dr Michael Johnson"])
+    full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
     email = f"{full_name.replace(' ', '.').lower()}@example.com"
     email_verified = datetime.fromtimestamp(random.randint(1000000, 1000000000)) 
     password = random_password(16)
     image = f"{full_name.lower().replace(' ', '_')}.jpg"
     title = "Dr"
-    _, first_name, last_name = full_name.split()
+    first_name, last_name = full_name.split()
 
     with conn.cursor() as cursor:
         cursor.execute("""
@@ -52,11 +56,11 @@ def create_doctor():
 # Function to create a user
 def create_user(doctor_ids):
     user_id = random_id()
-    full_name = random.choice(["Alice Smith", "Bob Jones", "Charlie Brown", "Diana Ross", "Eve Johnson"])
+    full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
     email = f"{full_name.replace(' ', '_').lower()}@example.com"
     password = random_password(16)
     image = f"{full_name.lower().replace(' ', '_')}.jpg"
-    email_verified = datetime.fromtimestamp(random.randint(1000000, 1000000000)) 
+    email_verified = datetime.fromtimestamp(random.randint(1583064000, 1709838848)) 
 
     doctor_id = random.choice(doctor_ids)
 
@@ -72,9 +76,11 @@ def create_user(doctor_ids):
     return user_id
 
 with conn.cursor() as cursor:
-    doctor_ids = [create_doctor() for _ in range(3)]  # Generating data for 3 doctors
+    DOCTORS = 10
+    PATIENTS = 250
+    doctor_ids = [create_doctor() for _ in range(DOCTORS)]  # Generating data for 3 doctors
 
-    for _ in range(5):  # Generating data for 5 users
+    for _ in range(PATIENTS):  # Generating data for 5 users
         create_user(doctor_ids)
 
     print("Random data successfully inserted into the database.")
