@@ -85,5 +85,27 @@ with conn.cursor() as cursor:
 
     print("Random data successfully inserted into the database.")
 
+# Function to create an appointment
+def create_appointments(doctor_ids, user_ids):
+    appointment_id = random_id()
+    appointment_date = datetime.fromtimestamp(random.randint(1000000000, 2000000000))
+    doctor_id = random.choice(doctor_ids)
+    user_id = random.choice(user_ids)
+
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO public."gp-system_appointment" (id, "doctorId", "userId", "appointmentDate")
+            VALUES (%s, %s, %s, %s);
+        """, (appointment_id, doctor_id, user_id, appointment_date))
+
+    return appointment_id
+
+# Generate data for appointments
+with conn.cursor() as cursor:
+    user_ids = [create_user(doctor_ids) for _ in range(5)]  # Generating data for 5 users
+
+    for _ in range(10):  # Generating data for 10 appointments
+        create_appointments(doctor_ids, user_ids)
+
 conn.commit()
 conn.close()
