@@ -10,8 +10,8 @@ interface UpcomingProps {
 }
 
 const Upcoming: React.FC<UpcomingProps> = ({ session }) => {
-    const appointments = api.appointment.getAppointments.useQuery()
-        
+    const appointments = api.appointment.getAppointments.useQuery();
+
     return (
         <div className="dashboard">
             <aside className="sidebar">

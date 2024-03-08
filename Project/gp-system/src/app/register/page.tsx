@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import "~/styles/temp.css";
 import { api } from "~/trpc/react";
+import { z } from "zod";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function ResgiterPage() {
     const [title, setTitle] = useState("");
@@ -13,17 +16,35 @@ export default function ResgiterPage() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     const register = api.user.registerUser.useMutation();
+    const router = useRouter();
 
-    const handleRegistration = (event: React.FormEvent) => {
+    const handleRegistration = async (event: React.FormEvent) => {
         event.preventDefault();
+
+        // Check if some field is empty
+        const empty_check = (s: string) => z.string().min(1).safeParse(s).success;
+        const fields = [title, firstName, surname, email, password, confirmPassword]
+        if (fields.map(empty_check).includes(false)) {
+            toast.error("Please fill in all values.")
+            return;
+        }
+
         register.mutate({
             title,
             fname: firstName,
             lname: surname,
             email,
-            password,
+            password
         });
-        // Validation and registration logic here
+
+        if (!register.data?.success && register.data?.reason) {
+            toast.error(register.data?.reason);
+            return
+        }
+        
+        toast.success("Success! User created. Redirecting you to login...")
+        await new Promise(resolve => setTimeout(resolve, 200));
+        router.push("/login");
     };
 
     return (
@@ -38,7 +59,6 @@ export default function ResgiterPage() {
                         name="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        required
                     />
                     <label htmlFor="first-name">First Name:</label>
                     <input
@@ -47,7 +67,6 @@ export default function ResgiterPage() {
                         name="first-name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        required
                     />
                     <label htmlFor="surname">Surname:</label>
                     <input
@@ -56,7 +75,6 @@ export default function ResgiterPage() {
                         name="surname"
                         value={surname}
                         onChange={(e) => setSurname(e.target.value)}
-                        required
                     />
                     <label htmlFor="email">Email:</label>
                     <input
@@ -65,7 +83,6 @@ export default function ResgiterPage() {
                         name="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
                     />
                     <label htmlFor="password">Create Password:</label>
                     <input
@@ -74,7 +91,6 @@ export default function ResgiterPage() {
                         name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                     />
                     <label htmlFor="confirm-password">
                         Enter Password Again:
@@ -85,7 +101,6 @@ export default function ResgiterPage() {
                         name="confirm-password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
                     />
                     <button type="submit" className="register-button">
                         Register
@@ -98,5 +113,4 @@ export default function ResgiterPage() {
             </div>
         </div>
     );
-};
-
+}
