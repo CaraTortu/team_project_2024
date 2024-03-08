@@ -75,37 +75,30 @@ def create_user(doctor_ids):
 
     return user_id
 
-with conn.cursor() as cursor:
-    DOCTORS = 10
-    PATIENTS = 250
-    doctor_ids = [create_doctor() for _ in range(DOCTORS)]  # Generating data for 3 doctors
-
-    for _ in range(PATIENTS):  # Generating data for 5 users
-        create_user(doctor_ids)
-
-    print("Random data successfully inserted into the database.")
-
 # Function to create an appointment
 def create_appointments(doctor_ids, user_ids):
-    appointment_id = random_id()
-    appointment_date = datetime.fromtimestamp(random.randint(1000000000, 2000000000))
+    appointment_date = datetime.fromtimestamp(random.randint(1709838848, 1900000000))
     doctor_id = random.choice(doctor_ids)
     user_id = random.choice(user_ids)
+    created_by = random.choice([doctor_id, user_id])
 
     with conn.cursor() as cursor:
         cursor.execute("""
-            INSERT INTO public."gp-system_appointment" (id, "doctorId", "userId", "appointmentDate")
+            INSERT INTO public."gp-system_appointment" ("doctorId", "userId", "appointmentDate", "createdById")
             VALUES (%s, %s, %s, %s);
-        """, (appointment_id, doctor_id, user_id, appointment_date))
+        """, (doctor_id, user_id, appointment_date, created_by))
 
-    return appointment_id
 
-# Generate data for appointments
-with conn.cursor() as cursor:
-    user_ids = [create_user(doctor_ids) for _ in range(5)]  # Generating data for 5 users
+DOCTORS = 10
+PATIENTS = 250
+APPOINTMENTS = 50
+doctor_ids = [create_doctor() for _ in range(DOCTORS)]
+user_ids = [create_user(doctor_ids) for _ in range(PATIENTS)]
 
-    for _ in range(10):  # Generating data for 10 appointments
-        create_appointments(doctor_ids, user_ids)
+for _ in range(APPOINTMENTS):
+    create_appointments(doctor_ids, user_ids)
+
+print("Random data successfully inserted into the database.")
 
 conn.commit()
 conn.close()

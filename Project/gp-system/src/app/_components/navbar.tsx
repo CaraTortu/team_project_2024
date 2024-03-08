@@ -16,9 +16,7 @@ const NavBar: React.FC<AppointmentProps> = ({ session }) => {
             <div className="mr-4 mt-2 flex w-full flex-row justify-end gap-2">
                 <Button
                     onClick={() =>
-                        router.push(
-                            session ? "/api/auth/signout" : "/api/auth/signin",
-                        )
+                        router.push(session ? "/api/auth/signout" : "/login")
                     }
                     variant="outline"
                 >
