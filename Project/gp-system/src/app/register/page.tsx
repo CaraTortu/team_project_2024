@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import "~/styles/temp.css";
 import { api } from "~/trpc/react";
 import { z } from "zod";
 import toast from "react-hot-toast";

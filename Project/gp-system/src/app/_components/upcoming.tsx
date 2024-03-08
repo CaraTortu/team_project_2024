@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { signOut } from "next-auth/react";
-import "~/styles/temp.css";
 import { Session } from "next-auth";
 import { api } from "~/trpc/react";
 

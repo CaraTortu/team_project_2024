@@ -2,7 +2,6 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import "~/styles/temp.css";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
