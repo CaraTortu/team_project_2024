@@ -10,6 +10,8 @@ interface UpcomingProps {
 
 const Upcoming: React.FC<UpcomingProps> = ({ session }) => {
     const appointments = api.appointment.getAppointments.useQuery();
+    
+    console.log(appointments.data)
 
     return (
         <div className="dashboard">
@@ -37,18 +39,15 @@ const Upcoming: React.FC<UpcomingProps> = ({ session }) => {
             <main className="main-content">
                 <section className="upcoming-appointments">
                     <h2>Upcoming</h2>
-                    <div className="appointment-item">
-                        <span className="appointment-date">
-                            24/02/2024, 10:30 AM
-                        </span>
-                        <span className="appointment-name">Blood Test</span>
-                    </div>
-                    <div className="appointment-item">
-                        <span className="appointment-date">
-                            18/02/2024, 3:15 PM
-                        </span>
-                        <span className="appointment-name">Breast X-ray</span>
-                    </div>
+                    {appointments.data && appointments.data.map(appointment => (
+                        <div className="appointment-item" key={appointment.appointmentDate.toISOString()}>
+                            <span className="appointment-date">
+                                {appointment.appointmentDate.toDateString()}
+                            </span>
+                            <span className="appointment-name">{appointment.doctorName}</span>
+                        </div>
+
+                    ))}
                 </section>
             </main>
         </div>
