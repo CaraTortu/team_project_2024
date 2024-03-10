@@ -48,8 +48,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-      command: 'bash ./start_dev_webserver.sh',
+      command: process.platform == "linux" ? 'bash ./start_dev_webserver.sh' : 'powershell -File start_dev_webserver.ps1',
       url: 'http://127.0.0.1:3000',
       reuseExistingServer: !process.env.CI,
+      stdout: "pipe"
   },
 });
