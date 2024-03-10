@@ -18,11 +18,5 @@ echo "[+] Created DB"
 # Set up the web server
 echo "[i] Setting up web server"
 cd ../gp-system
-
-if [ ! -d "node_modules" ]; then
-    npm ci 
-fi
-
 npm run dev 
-echo "[+] Web server running at 127.0.0.1:3000"
 

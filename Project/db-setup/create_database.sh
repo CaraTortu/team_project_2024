@@ -56,6 +56,7 @@ docker run --name $DB_CONTAINER_NAME -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGR
 
 echo "[+] Database container was succesfuly created... Pushing schema"
 
+npm ci
 npx drizzle-kit push:pg
 
 echo "[+] Database schema has been pushed to the container"
@@ -65,7 +66,7 @@ cd ../db-setup
 if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
 
-    if [ -x "apt" ]; then 
+    if [ "${apt}" ]; then 
         apt install python3-dev
     fi
 
