@@ -67,7 +67,7 @@ if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
 
     if [ -x "$(command -v apt)" ]; then 
-        apt install python3-dev
+        apt install python3-dev -y
     fi
 
     if ! [ -d ".venv" ]; then
