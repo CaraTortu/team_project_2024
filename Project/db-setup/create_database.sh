@@ -56,7 +56,7 @@ docker run --name $DB_CONTAINER_NAME -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGR
 
 echo "[+] Database container was succesfuly created... Pushing schema"
 
-npm ci
+npm i
 npx drizzle-kit push:pg
 
 echo "[+] Database schema has been pushed to the container"
