@@ -21,10 +21,18 @@ export default function ResgiterPage() {
         event.preventDefault();
 
         // Check if some field is empty
-        const empty_check = (s: string) => z.string().min(1).safeParse(s).success;
-        const fields = [title, firstName, surname, email, password, confirmPassword]
+        const empty_check = (s: string) =>
+            z.string().min(1).safeParse(s).success;
+        const fields = [
+            title,
+            firstName,
+            surname,
+            email,
+            password,
+            confirmPassword,
+        ];
         if (fields.map(empty_check).includes(false)) {
-            toast.error("Please fill in all values.")
+            toast.error("Please fill in all values.");
             return;
         }
 
@@ -33,16 +41,16 @@ export default function ResgiterPage() {
             fname: firstName,
             lname: surname,
             email,
-            password
+            password,
         });
 
         if (!register.data?.success && register.data?.reason) {
             toast.error(register.data?.reason);
-            return
+            return;
         }
-        
-        toast.success("Success! User created. Redirecting you to login...")
-        await new Promise(resolve => setTimeout(resolve, 200));
+
+        toast.success("Success! User created. Redirecting you to login...");
+        await new Promise((resolve) => setTimeout(resolve, 200));
         router.push("/login");
     };
 
