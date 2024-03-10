@@ -26,22 +26,28 @@ if ! [ -x "$(command -v python3)" ]; then
   exit 1
 fi
 
+# Check if container already exists and is already running
 if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
-  docker start $DB_CONTAINER_NAME
-  echo "[+] Database container started"
+  echo "[+] Database container is already running"
   exit 0
 fi
 
-# import env variables from .env
-set -a
-cd ../gp-system
+if [ "$(docker ps -a -q -f name=$DB_CONTAINER_NAME)" ]; then
+  echo "[+] Container already exists. Starting container..."
+  docker start $DB_CONTAINER_NAME
+  echo "[+] Done"
+  exit 0
+fi
 
-if ! [ -x ".env" ]; then
+# Container does not exist, create it and run it
+set -a
+
+if ! [ -x "../gp-system/.env" ]; then
     echo "[-] ERROR: Please create the .env file in ../gp-system from the template .env.example"
     exit 1
 fi
 
-source .env
+source ../gp-system/.env
 
 DB_PASSWORD=$(echo $DATABASE_URL | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
 
@@ -53,7 +59,7 @@ npx drizzle-kit push:pg
 
 echo "[+] Database schema has been pushed to the container"
 
-cd ../db_setup
+# Populate database if running in development mode
 if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
     

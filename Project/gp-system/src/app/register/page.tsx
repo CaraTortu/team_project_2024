@@ -36,7 +36,7 @@ export default function ResgiterPage() {
             return;
         }
 
-        register.mutate({
+        await register.mutateAsync({
             title,
             fname: firstName,
             lname: surname,
@@ -44,11 +44,12 @@ export default function ResgiterPage() {
             password,
         });
 
+
         if (!register.data?.success && register.data?.reason) {
             toast.error(register.data?.reason);
             return;
         }
-
+        
         toast.success("Success! User created. Redirecting you to login...");
         await new Promise((resolve) => setTimeout(resolve, 200));
         router.push("/login");
