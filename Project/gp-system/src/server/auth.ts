@@ -42,6 +42,9 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: "jwt",
     },
+    pages: {
+        signIn: "/login",
+    },
     callbacks: {
         session: async ({ session, token }) => {
             const query = await db.query.users.findFirst({
