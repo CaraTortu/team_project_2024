@@ -64,10 +64,16 @@ echo "[+] Database schema has been pushed to the container"
 cd ../db-setup
 if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
-    
-    if ! [ ! -d ".venv" ]; then
+
+    if [ -x "apt" ]; then 
+        apt install python3-dev
+    fi
+
+    if ! [ -d ".venv" ]; then
         python3 -m venv .venv
+        source .venv/bin/activate
         python3 -m pip install -r requirements.txt
+        deactivate
     fi
 
     source .venv/bin/activate
