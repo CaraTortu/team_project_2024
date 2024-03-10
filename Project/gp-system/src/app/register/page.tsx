@@ -43,13 +43,14 @@ export default function ResgiterPage() {
             email,
             password,
         });
-
+        
+        console.log(register)
 
         if (!register.data?.success && register.data?.reason) {
             toast.error(register.data?.reason);
             return;
         }
-        
+        return
         toast.success("Success! User created. Redirecting you to login...");
         await new Promise((resolve) => setTimeout(resolve, 200));
         router.push("/login");

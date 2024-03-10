@@ -41,17 +41,18 @@ fi
 
 # Container does not exist, create it and run it
 set -a
+cd ../gp-system
 
-if ! [ -x "../gp-system/.env" ]; then
+if ! [ -x ".env" ]; then
     echo "[-] ERROR: Please create the .env file in ../gp-system from the template .env.example"
     exit 1
 fi
 
-source ../gp-system/.env
+source .env
 
 DB_PASSWORD=$(echo $DATABASE_URL | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
 
-docker run --name $DB_CONTAINER_NAME -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGRES_DB=gp_system -d -p 5432:5432 docker.io/postgres
+docker run --name $DB_CONTAINER_NAME -e POSTGRES_PASSWORD=$DB_PASSWORD -e POSTGRES_DB=gp-system -d -p 5432:5432 docker.io/postgres
 
 echo "[+] Database container was succesfuly created... Pushing schema"
 
@@ -60,10 +61,11 @@ npx drizzle-kit push:pg
 echo "[+] Database schema has been pushed to the container"
 
 # Populate database if running in development mode
+cd ../db-setup
 if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
     
-    if ! [ -x ".venv" ]; then
+    if ! [ ! -d ".venv" ]; then
         python3 -m venv .venv
         python3 -m pip install -r requirements.txt
     fi
