@@ -66,7 +66,7 @@ cd ../db-setup
 if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
 
-    if [ "${apt}" ]; then 
+    if [ -x "$(command -v apt)" ]; then 
         apt install python3-dev
     fi
 
