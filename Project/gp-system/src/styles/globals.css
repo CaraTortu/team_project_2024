@@ -191,10 +191,6 @@
     padding: 20px;
 }
 
-.logo-container {
-    /* Add styles for your logo container here */
-}
-
 .navigation ul {
     list-style: none;
     padding: 0;
@@ -240,4 +236,132 @@
     display: block;
     color: #2c3e50;
     font-size: 20px;
+}
+
+/* BookApointmentPage css*/
+
+/* src/pages/BookAppointmentPage/BookAppointmentPage.css */
+.book-appointment-page {
+    display: flex;
+    height: 100vh;
+}
+
+.appointment-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #ecf0f1;
+}
+
+.calendar {
+    /* Styles for your calendar component */
+}
+
+.appointment-list h2 {
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+.appointment-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.appointment-item:hover,
+.appointment-item.selected {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.appointment-time {
+    font-weight: bold;
+}
+
+.appointment-info {
+    text-align: right;
+}
+
+.select-appointment-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.select-appointment-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Sidebar.css */
+
+.logo-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+.navigation li a {
+    color: white;
+    text-decoration: none;
+    display: block; /* Make the link fill the li for bigger click area */
+    margin: 0 -40px; /* This counteracts the padding to allow the background to extend fully */
+    padding: 10px 50px; /* Adjust padding as necessary */
+}
+
+.navigation li a.active {
+    background-color: #34495e;
+    border-radius: 0; /* Add border-radius if you want rounded corners */
+    margin: 0 -40px; /* This counteracts the padding to allow the background to extend fully */
+    padding: 10px 50px; /* Increase padding to account for the margin adjustment */
+    border-left: #9da7ba;
+    border-width: 10px;
+}
+
+/* calendar.css */
+
+.week-calendar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-grow: 1;
+    margin: 0 2px;
+}
+
+.day.selected {
+    background-color: #3498db;
+    color: white;
+}
+
+.day-name {
+    font-weight: bold;
+}
+
+.day-number {
+    font-size: larger;
 }

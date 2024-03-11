@@ -1,18 +1,14 @@
-import { unstable_noStore as noStore } from "next/cache";
-import { getServerAuthSession } from "~/server/auth";
-import { MakeAppointment } from "~/app/_components/makeappointment";
-import { NavBar } from "~/app/_components/navbar";
+import React from "react";
+import { TopBar } from "~/app/_components/ui/topbar";
 
-export default async function Home() {
-    noStore();
-    const session = await getServerAuthSession();
-
+export default function mainPage() {
     return (
-        <main className="from-gp-900 to-gp-600 flex min-h-screen flex-col bg-gradient-to-b text-white">
-            <div className="flex flex-col items-center justify-center gap-4">
-                <NavBar session={session} />
-                {session && <MakeAppointment session={session} />}
+        <div>
+            <TopBar />
+            <div className="greeting-message">
+                Welcome to the GP Appointment System!
             </div>
-        </main>
+            {/* Additional content of the main page goes here */}
+        </div>
     );
 }

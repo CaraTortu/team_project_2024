@@ -7,7 +7,9 @@ export const env = createEnv({
             "❌ Invalid environment variables:",
             error.flatten().fieldErrors,
         );
-        console.log("Make sure to have a .env file with the environment variables in .env.example")
+        console.log(
+            "Make sure to have a .env file with the environment variables in .env.example",
+        );
         throw new Error("Invalid environment variables");
     },
     /**

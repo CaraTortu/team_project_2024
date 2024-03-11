@@ -43,7 +43,7 @@ export default function ResgiterPage() {
             email,
             password,
         });
-        
+
         if (!register.data?.success && register.data?.reason) {
             toast.error(register.data?.reason);
             return;
