@@ -9,13 +9,14 @@ export const appointmentRouter = createTRPCRouter({
     getAppointments: protectedProcedure.query(async ({ ctx: { session } }) => {
         return await db
             .select({
+                id: appointment.id,
                 appointmentDate: appointment.appointmentDate,
                 paymentAmount: appointment.paymentAmount,
                 paymentStatus: appointment.paymentStatus,
                 isCancelled: appointment.isCancelled,
                 title: appointment.title,
                 details: appointment.details,
-                doctorName: users.name
+                doctorName: users.name,
             })
             .from(appointment)
             .where(eq(appointment.userId, session.user.id))
