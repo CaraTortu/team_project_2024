@@ -81,12 +81,13 @@ def create_appointments(doctor_ids, user_ids):
     doctor_id = random.choice(doctor_ids)
     user_id = random.choice(user_ids)
     created_by = random.choice([doctor_id, user_id])
+    title = random.choice(["X-Ray", "Blood test", "Follow up", "Prescription update"])
 
     with conn.cursor() as cursor:
         cursor.execute("""
-            INSERT INTO public."gp-system_appointment" ("doctorId", "userId", "appointmentDate", "createdById")
-            VALUES (%s, %s, %s, %s);
-        """, (doctor_id, user_id, appointment_date, created_by))
+            INSERT INTO public."gp-system_appointment" ("title", "details", "doctorId", "userId", "appointmentDate", "createdById")
+            VALUES (%s, 'No details', %s, %s, %s, %s);
+        """, (title, doctor_id, user_id, appointment_date, created_by))
 
 
 DOCTORS = 10

@@ -13,7 +13,9 @@ export const appointmentRouter = createTRPCRouter({
                 paymentAmount: appointment.paymentAmount,
                 paymentStatus: appointment.paymentStatus,
                 isCancelled: appointment.isCancelled,
-                doctorName: users.name,
+                title: appointment.title,
+                details: appointment.details,
+                doctorName: users.name
             })
             .from(appointment)
             .where(eq(appointment.userId, session.user.id))

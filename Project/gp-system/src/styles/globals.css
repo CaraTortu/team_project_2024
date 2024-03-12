@@ -2,68 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    :root {
-        --background: 224 71% 4%;
-        --foreground: 213 31% 91%;
-
-        --muted: 223 47% 11%;
-        --muted-foreground: 215.4 16.3% 56.9%;
-
-        --accent: 222.2 47.4% 20%;
-        --accent-foreground: 210 40% 98%;
-
-        --popover: 224 71% 4%;
-        --popover-foreground: 215 20.2% 65.1%;
-
-        --border: 216 34% 17%;
-        --input: 216 34% 17%;
-
-        --card: 224 71% 4%;
-        --card-foreground: 213 31% 91%;
-
-        --primary: 210, 96%, 50%;
-        --primary-foreground: 222.2 47.4% 98%;
-
-        --secondary: 222.2 47.4% 35%;
-        --secondary-foreground: 210 40% 98%;
-
-        --destructive: 0 63% 31%;
-        --destructive-foreground: 210 40% 98%;
-
-        --ring: 216 34% 17%;
-
-        --radius: 0.5rem;
-    }
-}
-
-@layer base {
-    * {
-        @apply border-border;
-    }
-    body {
-        font-feature-settings:
-            "rlig" 1,
-            "calt" 1;
-    }
-}
-
+/*
 .App-header {
     background-color: #282c34;
     min-height: 50px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-end; /* Align items to the right */
-    padding-right: 20px; /* Add some padding on the right */
+    justify-content: flex-end;  Align items to the right 
+    padding-right: 20px; /* Add some padding on the right 
     color: white;
 }
 
 .login-button {
-    margin-top: 20px; /* Add some space on the top */
-    text-align: center; /* Center the greeting message */
-    font-size: 24px; /* Increase the font size */
-    color: #282c34; /* Set a color for the text */
+    margin-top: 20px; /* Add some space on the top 
+    text-align: center; /* Center the greeting message 
+    font-size: 24px; /* Increase the font size 
+    color: #282c34; /* Set a color for the text 
 }
 
 .login-page,
@@ -93,7 +48,7 @@
 
 .login-form input {
     padding: 8px;
-    width: calc(100% - 16px); /* Adjust input width */
+    width: calc(100% - 16px); /* Adjust input width 
 }
 
 .login-link,
@@ -104,7 +59,7 @@
 .login-link a,
 .register-link a {
     color: #007bff;
-    text-decoration: none; /* Optional: if you prefer no underline */
+    text-decoration: none; /* Optional: if you prefer no underline 
 }
 
 .container {
@@ -112,14 +67,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Use the full height of the viewport */
+    min-height: 100vh; /* Use the full height of the viewport 
     padding: 20px;
 }
 
 .register-page {
     width: 100%;
     max-width: 400px;
-    margin: auto; /* Center the form */
+    margin: auto; /* Center the form 
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -144,7 +99,7 @@
     margin-bottom: 20px;
     border-radius: 20px;
     border: 1px solid #ddd;
-    box-sizing: border-box; /* Include padding in width */
+    box-sizing: border-box; /* Include padding in width 
 }
 
 .register-form button {
@@ -152,7 +107,7 @@
     padding: 10px;
     border-radius: 20px;
     border: none;
-    background-color: #4b82e9; /* Cornflower Blue */
+    background-color: #4b82e9; /* Cornflower Blue 
     color: white;
     font-size: 16px;
     cursor: pointer;
@@ -173,8 +128,6 @@
     color: #6495ed;
     text-decoration: none;
 }
-
-/* upcomingPage css*/
 
 .dashboard {
     display: flex;
@@ -238,9 +191,6 @@
     font-size: 20px;
 }
 
-/* BookApointmentPage css*/
-
-/* src/pages/BookAppointmentPage/BookAppointmentPage.css */
 .book-appointment-page {
     display: flex;
     height: 100vh;
@@ -253,7 +203,6 @@
 }
 
 .calendar {
-    /* Styles for your calendar component */
 }
 
 .appointment-list h2 {
@@ -302,8 +251,6 @@
     background-color: #2980b9;
 }
 
-/* Sidebar.css */
-
 .logo-container img {
     max-width: 100%;
     height: auto;
@@ -312,21 +259,19 @@
 .navigation li a {
     color: white;
     text-decoration: none;
-    display: block; /* Make the link fill the li for bigger click area */
-    margin: 0 -40px; /* This counteracts the padding to allow the background to extend fully */
-    padding: 10px 50px; /* Adjust padding as necessary */
+    display: block; /* Make the link fill the li for bigger click area 
+    margin: 0 -40px; /* This counteracts the padding to allow the background to extend fully 
+    padding: 10px 50px; /* Adjust padding as necessary 
 }
 
 .navigation li a.active {
     background-color: #34495e;
-    border-radius: 0; /* Add border-radius if you want rounded corners */
-    margin: 0 -40px; /* This counteracts the padding to allow the background to extend fully */
-    padding: 10px 50px; /* Increase padding to account for the margin adjustment */
+    border-radius: 0; /* Add border-radius if you want rounded corners 
+    margin: 0 -40px; /* This counteracts the padding to allow the background to extend fully 
+    padding: 10px 50px; /* Increase padding to account for the margin adjustment 
     border-left: #9da7ba;
     border-width: 10px;
 }
-
-/* calendar.css */
 
 .week-calendar {
     display: flex;
@@ -365,3 +310,4 @@
 .day-number {
     font-size: larger;
 }
+*/

@@ -118,6 +118,7 @@ export const appointment = createTable(
     "appointment",
     {
         id: serial("id").primaryKey(),
+        title: varchar("title", { length: 255 }),
         userId: varchar("userId", { length: 255 })
             .references(() => users.id)
             .notNull(),
@@ -130,6 +131,7 @@ export const appointment = createTable(
         appointmentDate: timestamp("appointmentDate", {
             mode: "date",
         }).notNull(),
+        details: varchar("details", { length: 2048 }),
         paymentAmount: real("paymentAmount"),
         paymentStatus: paymentStatus("paymentStatus").default("pending"),
         isCancelled: boolean("isCancelled").default(false),
