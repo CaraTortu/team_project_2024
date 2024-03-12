@@ -7,7 +7,7 @@ const Sidebar: React.FC = () => {
       <div className="w-64 h-full bg-blue-800 text-white flex flex-col">
         <div className="px-4 py-6">
             <div>
-              <img src="/jogo.png" alt="GP Appointment System Logo" className="h-12 w-12" /> {/* will need to find logo soon */}
+              <img src="/logo.png" alt="GP Appointment System Logo" className="h-12 w-12" /> {/* will need to find logo soon */}
             </div>
           </div>
         <div className="flex-grow">

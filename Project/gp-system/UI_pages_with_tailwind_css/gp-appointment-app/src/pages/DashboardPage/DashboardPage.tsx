@@ -37,7 +37,7 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-vh bg-gray-100">
       <Sidebar />
       {/* Add pl-64 to make padding equal to the sidebar width */}
       <div className="flex-grow p-4 pl-72">
