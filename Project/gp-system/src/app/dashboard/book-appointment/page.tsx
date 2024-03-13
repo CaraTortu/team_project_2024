@@ -1,38 +1,34 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { format, startOfWeek, addDays, isBefore, isToday } from "date-fns";
+import React, { useState } from "react";
+import { format, addDays, isBefore, isToday } from "date-fns";
 import { api } from "~/trpc/react";
-
-type AppointmentSlot = {
-    doctor_id: string;
-    doctor_name: string | null;
-    available_appointments: Date[];
-};
+import toast from "react-hot-toast";
 
 export default function BookAppointmentPage() {
+    const clinic_selected = 2;
 
-    const clinic_selected = 1;
     const [selectedDate, setSelectedDate] = useState<Date>(
-        startOfWeek(new Date(), { weekStartsOn: 1 }),
+        new Date(),
     );
 
-    const [weekDays, setWeekDays] = useState<Date[]>([]);
-    const [selectedSlotId, setSelectedSlotId] = useState<{ time: Date, doctor_id: string } | null>(null);
     const available_appointments =
         api.appointment.getAvailableAppointments.useQuery({
             day: selectedDate,
             clinic_id: clinic_selected,
         });
+    
+    const weekDays: Date[] = [];
+    
+    for (let i = 0; i < 7; i++) {
+        weekDays.push(addDays(selectedDate, i-3));
+    }
 
+    const [selectedSlotId, setSelectedSlotId] = useState<{
+        time: Date;
+        doctor_id: string;
+    } | null>(null);
 
-    useEffect(() => {
-        const days: Date[] = [];
-        for (let i = 0; i < 5; i++) {
-            days.push(addDays(selectedDate, i));
-        }
-
-        setWeekDays(days);
-    }, [selectedDate]);
+    const make_booking = api.appointment.createAppointment.useMutation();
 
     // Navigation functions for week
     const goToPreviousWeek = () => {
@@ -47,13 +43,21 @@ export default function BookAppointmentPage() {
     const confirmBooking = () => {
         if (!selectedSlotId || !selectedDate) return;
 
-        console.log("Booking id:", selectedSlotId);
+        make_booking.mutate({
+            doctorId: selectedSlotId.doctor_id,
+            appointmentDate: selectedSlotId.time,
+        });
+
+        if (!make_booking.data?.success && make_booking.data?.reason) {
+            toast.error(make_booking.data.reason);
+            return;
+        }
+
+        // Here you would also typically send a confirmation to the backend.
+        toast.success("Appointment booked successfully!");
 
         // Clear the selected slot and provide any further confirmation needed.
         setSelectedSlotId(null);
-
-        // Here you would also typically send a confirmation to the backend.
-        alert("Appointment booked successfully!");
     };
 
     return (
@@ -64,7 +68,7 @@ export default function BookAppointmentPage() {
                     onClick={goToPreviousWeek}
                     className="rounded-lg bg-blue-200 px-4 py-2 hover:bg-blue-300"
                 >
-                    Previous Week
+                    Previous week
                 </button>
                 {weekDays.map((day) => (
                     <button
@@ -87,38 +91,46 @@ export default function BookAppointmentPage() {
                     onClick={goToNextWeek}
                     className="rounded-lg bg-blue-200 px-4 py-2 hover:bg-blue-300"
                 >
-                    Next Week
+                    Next week
                 </button>
             </div>
             <div className="flex gap-4">
-                {available_appointments.status == "success" && available_appointments.data.data!.map((doctor) => (
-                    <div className="flex flex-col gap-4">
-                        {doctor.available_appointments.map((slot) => {
-                            const slotClassName = getSlotClassName(slot);
+                {available_appointments.status == "success" &&
+                    available_appointments.data.data!.map((doctor) => (
+                        <div className="flex flex-col gap-4">
+                            {doctor.available_appointments.map((slot) => {
+                                const slotClassName = getSlotClassName(slot);
 
-                            function getSlotClassName(slot: Date): string {
-                                if (
-                                    slot == selectedSlotId?.time && doctor.doctor_id == selectedSlotId?.doctor_id
-                                ) {
-                                    return "bg-blue-300";
-                                } else {
-                                    return "bg-green-200 hover:bg-green-300";
+                                function getSlotClassName(slot: Date): string {
+                                    if (
+                                        slot == selectedSlotId?.time &&
+                                        doctor.doctor_id ==
+                                            selectedSlotId?.doctor_id
+                                    ) {
+                                        return "bg-blue-300";
+                                    } else {
+                                        return "bg-green-200 hover:bg-green-300";
+                                    }
                                 }
-                            }
 
-                            return (
-                                <button
-                                    key={slot.getTime().toString()}
-                                    className={`rounded-lg border p-2 text-left flex gap-2 ${slotClassName}`}
-                                    onClick={() => setSelectedSlotId({time: slot, doctor_id: doctor.doctor_id})}
-                                >
-                                    {format(slot, "dd/MM/yyyy hh:mm")} -
-                                    {doctor.doctor_name}
-                                </button>
-                            );
-                        })}
-                    </div>
-                ))}
+                                return (
+                                    <button
+                                        key={slot.getTime().toString()}
+                                        className={`flex gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
+                                        onClick={() =>
+                                            setSelectedSlotId({
+                                                time: slot,
+                                                doctor_id: doctor.doctor_id,
+                                            })
+                                        }
+                                    >
+                                        {format(slot, "dd/MM/yyyy hh:mm")} -
+                                        {doctor.doctor_name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    ))}
             </div>
             {selectedSlotId && (
                 <button

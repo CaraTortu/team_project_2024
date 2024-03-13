@@ -105,8 +105,10 @@ export const appointmentRouter = createTRPCRouter({
                     available_appointments: availableAppointments.filter(
                         (appointment) =>
                             !appointment_booked_doctor
-                                .map((a) => a.appointmentDate.toDateString())
-                                .includes(appointment.toDateString()),
+                                .map((a) =>
+                                    a.appointmentDate.getTime().toString(),
+                                )
+                                .includes(appointment.getTime().toString()),
                     ),
                 };
             });
@@ -123,7 +125,7 @@ export const appointmentRouter = createTRPCRouter({
         )
         .mutation(async ({ ctx, input }) => {
             const patientId =
-                ctx.session.user.id == "user"
+                ctx.session.user.userType == "user"
                     ? ctx.session.user.id
                     : input.patientId;
 
