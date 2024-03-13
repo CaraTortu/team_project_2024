@@ -35,7 +35,7 @@ def random_password(len: int):
 def random_id():
     return random_string(16)
 
-def create_doctor():
+def create_doctor(clinic_id):
     doctor_id = random_id()
     full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
     email = f"{full_name.replace(' ', '.').lower()}@example.com"
@@ -47,14 +47,14 @@ def create_doctor():
 
     with conn.cursor() as cursor:
         cursor.execute("""
-            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType", "doctorId")
+            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType", "clinicId")
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-        """, (doctor_id, title, first_name, last_name, full_name, email, email_verified, password, image, "doctor", None))
+        """, (doctor_id, title, first_name, last_name, full_name, email, email_verified, password, image, "doctor", clinic_id))
 
     return doctor_id
 
 # Function to create a user
-def create_user(doctor_ids):
+def create_user():
     user_id = random_id()
     full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
     email = f"{full_name.replace(' ', '_').lower()}@example.com"
@@ -62,16 +62,15 @@ def create_user(doctor_ids):
     image = f"{full_name.lower().replace(' ', '_')}.jpg"
     email_verified = datetime.fromtimestamp(random.randint(1583064000, 1709838848)) 
 
-    doctor_id = random.choice(doctor_ids)
 
     title = random.choice(["Mr", "Ms"])
     first_name, last_name = full_name.split()
 
     with conn.cursor() as cursor:
         cursor.execute("""
-            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType", "doctorId")
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-        """, (user_id, title, first_name, last_name, full_name, email, email_verified, password, image, "user", doctor_id))
+            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType")
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """, (user_id, title, first_name, last_name, full_name, email, email_verified, password, image, "user"))
 
     return user_id
 
@@ -89,12 +88,24 @@ def create_appointments(doctor_ids, user_ids):
             VALUES (%s, 'No details', %s, %s, %s, %s);
         """, (title, doctor_id, user_id, appointment_date, created_by))
 
+def create_clinic():
+    clinic_address = str(random.randint(1,100))
+    clinic_address += " Avenue St. "
+    clinic_address += random.choice(["lorem", "ipsum", "dolor", "sit", "amet", "eunans", "hello"])
+    
+    with conn.cursor() as cursor:
+        cursor.execute("""
+        INSERT INTO public."gp-system_clinic" (address) VALUES(%s);
+                       """, (clinic_address,))
 
-DOCTORS = 10
+CLINICS = 30
+DOCTORS = 100
 PATIENTS = 250
 APPOINTMENTS = 50
-doctor_ids = [create_doctor() for _ in range(DOCTORS)]
-user_ids = [create_user(doctor_ids) for _ in range(PATIENTS)]
+[create_clinic() for _ in range(CLINICS)]
+
+doctor_ids = [create_doctor(random.randint(1, CLINICS)) for _ in range(DOCTORS)]
+user_ids = [create_user() for _ in range(PATIENTS)]
 
 for _ in range(APPOINTMENTS):
     create_appointments(doctor_ids, user_ids)

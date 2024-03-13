@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { eq, and, gt, lt } from "drizzle-orm";
+import { eq, and, gt, lt, inArray } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { appointment, users } from "~/server/db/schema";
@@ -24,8 +24,8 @@ export const appointmentRouter = createTRPCRouter({
             .execute();
     }),
     getAvailableAppointments: protectedProcedure
-        .input(z.object({ day: z.date() }))
-        .query(async ({ ctx: { session }, input }) => {
+        .input(z.object({ day: z.date(), clinic_id: z.number().min(0) }))
+        .query(async ({ input }) => {
             const startDate = new Date(
                 input.day.getFullYear(),
                 input.day.getMonth(),
@@ -37,34 +37,43 @@ export const appointmentRouter = createTRPCRouter({
                 input.day.getDate() + 1,
             );
 
-            const userDoctor = await db.query.users
-                .findFirst({ where: eq(users.id, session.user.id) })
-                .then((r) => r?.doctorId);
-
-            if (!userDoctor) {
-                return { success: false, reason: "You have not set your GP" };
-            }
-
-            const appointmentsBooked = await db
+            const clinic_doctors = await db
                 .select({
-                    appointmentDate: appointment.appointmentDate,
+                    id: users.id,
+                    name: users.name,
                 })
-                .from(appointment)
+                .from(users)
                 .where(
                     and(
-                        and(
-                            eq(appointment.isCancelled, false),
-                            gt(appointment.appointmentDate, startDate),
-                        ),
-                        lt(appointment.appointmentDate, endDate),
+                        eq(users.clinic_id, input.clinic_id),
+                        eq(users.userType, "doctor"),
                     ),
                 )
-                .execute()
-                .then((appointments) =>
-                    appointments.map((p) =>
-                        new Date(p.appointmentDate).toUTCString(),
+                .execute();
+
+            if (clinic_doctors === undefined) {
+                return { success: false, reason: "The clinic does not exist" };
+            }
+
+            const doctor_ids = clinic_doctors.map((doctor) => doctor.id);
+
+            const appointmentsBooked = await db.query.appointment.findMany({
+                where: and(
+                    and(
+                        inArray(appointment.doctorId, doctor_ids),
+                        gt(appointment.appointmentDate, startDate),
                     ),
-                );
+                    lt(appointment.appointmentDate, endDate),
+                ),
+                with: {
+                    doctor: {
+                        columns: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
+            });
 
             const latestDate = new Date(
                 input.day.getFullYear(),
@@ -76,20 +85,30 @@ export const appointmentRouter = createTRPCRouter({
             );
 
             // TODO: retrieve the latest time each person will work.
-            endDate.setHours(18);
+            endDate.setHours(14);
             endDate.setDate(endDate.getDate() - 1);
-            const availableAppointments = [];
+            const availableAppointments: Date[] = [];
+
             while (latestDate <= endDate) {
                 availableAppointments.push(new Date(latestDate.getTime()));
                 latestDate.setMinutes(latestDate.getMinutes() + 30);
             }
 
-            const freeAppointments = new Map();
-            availableAppointments.map((appointment) => {
-                freeAppointments.set(
-                    appointment.toUTCString(),
-                    !appointmentsBooked.includes(appointment.toUTCString()),
+            const freeAppointments = clinic_doctors.map((doctor) => {
+                const appointment_booked_doctor = appointmentsBooked.filter(
+                    (appointment) => appointment.doctor.id == doctor.id,
                 );
+
+                return {
+                    doctor_id: doctor.id,
+                    doctor_name: doctor.name,
+                    available_appointments: availableAppointments.filter(
+                        (appointment) =>
+                            !appointment_booked_doctor
+                                .map((a) => a.appointmentDate.toDateString())
+                                .includes(appointment.toDateString()),
+                    ),
+                };
             });
 
             return { success: true, data: freeAppointments };
@@ -98,6 +117,7 @@ export const appointmentRouter = createTRPCRouter({
         .input(
             z.object({
                 patientId: z.string().min(1).max(255).optional(),
+                doctorId: z.string().min(1).max(255),
                 appointmentDate: z.date(),
             }),
         )
@@ -111,18 +131,12 @@ export const appointmentRouter = createTRPCRouter({
                 return { success: false, reason: "Please supply a patient ID" };
             }
 
-            const doctorId = await db.query.users
-                .findFirst({
-                    where: eq(users.id, patientId),
-                })
-                .execute()
-                .then((user) => user?.doctorId);
+            const doctor = await db.query.users.findFirst({
+                where: eq(users.id, input.doctorId),
+            });
 
-            if (!doctorId) {
-                return {
-                    success: false,
-                    reason: "Could not find a doctorId assigned to this patient",
-                };
+            if (!doctor) {
+                return { success: false, reason: "Invalid doctor ID" };
             }
 
             // TODO: Check the appointment is free
@@ -133,10 +147,10 @@ export const appointmentRouter = createTRPCRouter({
                 .insert(appointment)
                 .values({
                     userId: patientId,
-                    doctorId: doctorId,
+                    doctorId: doctor.id,
                     createdById:
                         ctx.session.user.userType === "doctor"
-                            ? doctorId
+                            ? ctx.session.user.id
                             : patientId,
                     appointmentDate: input.appointmentDate,
                     paymentAmount: 60,

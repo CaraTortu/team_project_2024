@@ -36,13 +36,18 @@ export const users = createTable("user", {
     password: varchar("password", { length: 255 }),
     image: varchar("image", { length: 255 }),
     userType: userTypeEnum("userType").default("user").notNull(),
-    doctorId: varchar("doctorId", { length: 255 }),
+    clinic_id: integer("clinicId"),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
     accounts: many(accounts, { relationName: "accounts" }),
     user_appointments: many(appointment, { relationName: "user" }),
     doctor_appointments: many(appointment, { relationName: "doctor" }),
+    clinic_member: one(clinic, {
+        fields: [users.clinic_id],
+        references: [clinic.id],
+        relationName: "doctors",
+    }),
 }));
 
 export const accounts = createTable(
@@ -156,4 +161,13 @@ export const appointmentRelations = relations(appointment, ({ one }) => ({
         fields: [appointment.doctorId],
         references: [users.id],
     }),
+}));
+
+export const clinic = createTable("clinic", {
+    id: serial("id").primaryKey(),
+    address: varchar("address", { length: 1024 }).notNull(),
+});
+
+export const clinicRelations = relations(clinic, ({ many }) => ({
+    doctors: many(users, { relationName: "doctors" }),
 }));
