@@ -32,7 +32,8 @@ export default function BookAppointmentPage() {
 
     // Navigation functions for week
     const goToPreviousWeek = () => {
-        setSelectedDate(addDays(selectedDate, -7));
+        const days_previous = addDays(selectedDate, -7)
+        setSelectedDate(days_previous < new Date() ? new Date() : days_previous);
     };
 
     const goToNextWeek = () => {
@@ -66,7 +67,8 @@ export default function BookAppointmentPage() {
             <div className="mb-4 flex items-center justify-between">
                 <button
                     onClick={goToPreviousWeek}
-                    className="rounded-lg bg-blue-200 px-4 py-2 hover:bg-blue-300"
+                    className='rounded-lg px-4 py-2 bg-blue-200 hover:blue-300 disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:text-white'
+                    disabled={addDays(selectedDate, -3) < new Date()} 
                 >
                     Previous week
                 </button>
