@@ -8,10 +8,138 @@ import { MdPayment, MdOutlineUpcoming } from "react-icons/md";
 import { TbReportMedical } from "react-icons/tb";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 import { PiSignOut } from "react-icons/pi";
+import { Session } from "next-auth";
 
-const Sidebar: React.FC = () => {
+const UserLinks: React.FC<{
+    active_class: string;
+    unactive_class: string;
+    pathName: string;
+}> = ({ active_class, unactive_class, pathName }) => {
+    return (
+        <ul>
+            <li>
+                <Link
+                    href="/dashboard/my-info"
+                    className={
+                        pathName == "my-info" ? active_class : unactive_class
+                    }
+                >
+                    <CgProfile className="h-6 w-6" />
+                    My Info
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/upcoming"
+                    className={
+                        pathName == "upcoming" ? active_class : unactive_class
+                    }
+                >
+                    <MdOutlineUpcoming className="h-6 w-6" />
+                    Upcoming Appointments
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/book-appointment"
+                    className={
+                        pathName == "book-appointment"
+                            ? active_class
+                            : unactive_class
+                    }
+                >
+                    <TbReportMedical className="h-6 w-6" />
+                    Book an Appointment
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/billing"
+                    className={
+                        pathName == "billing" ? active_class : unactive_class
+                    }
+                >
+                    <MdPayment className="h-6 w-6" />
+                    Billing & Payments
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/support"
+                    className={
+                        pathName == "support" ? active_class : unactive_class
+                    }
+                >
+                    <IoIosHelpCircleOutline className="h-6 w-6" />
+                    Help/Support
+                </Link>
+            </li>
+        </ul>
+    );
+};
+
+const DoctorLinks: React.FC<{
+    active_class: string;
+    unactive_class: string;
+    pathName: string;
+}> = ({ active_class, unactive_class, pathName }) => {
+    return (
+        <ul className="space-y-2 text-sm">
+            <li>
+                <Link
+                    href="/dashboard/my-info"
+                    className={
+                        pathName == "my-info" ? active_class : unactive_class
+                    }
+                >
+                    My Info
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/schedule"
+                    className={
+                        pathName == "schedule" ? active_class : unactive_class
+                    }
+                >
+                    My Schedule
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/patient-records"
+                    className={
+                        pathName == "patient-records"
+                            ? active_class
+                            : unactive_class
+                    }
+                >
+                    Patient Records
+                </Link>
+            </li>
+            <li>
+                <Link
+                    href="/dashboard/support"
+                    className={
+                        pathName == "support" ? active_class : unactive_class
+                    }
+                >
+                    Help/Support
+                </Link>
+            </li>
+        </ul>
+    );
+};
+
+interface SideBarProps {
+   session: Session | null;
+}
+
+const Sidebar: React.FC<SideBarProps> = ({ session }) => {
     const pathNames = usePathname().split("/");
-    const pathName = pathNames[pathNames.length - 1];
+    const pathName = pathNames[pathNames.length - 1] ?? "";
+
+    console.log(session)
 
     const unactive_class =
         "block py-2 px-4 hover:bg-blue-700 duration-300 flex gap-2 items-center";
@@ -31,73 +159,20 @@ const Sidebar: React.FC = () => {
                     />
                 </div>
                 <nav className="w-full flex-grow">
-                    <ul>
-                        <li>
-                            <Link
-                                href="/dashboard/my-info"
-                                className={
-                                    pathName == "my-info"
-                                        ? active_class
-                                        : unactive_class
-                                }
-                            >
-                                <CgProfile className="h-6 w-6" />
-                                My Info
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="/dashboard/upcoming"
-                                className={
-                                    pathName == "upcoming"
-                                        ? active_class
-                                        : unactive_class
-                                }
-                            >
-                                <MdOutlineUpcoming className="h-6 w-6" />
-                                Upcoming Appointments
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="/dashboard/book-appointment"
-                                className={
-                                    pathName == "book-appointment"
-                                        ? active_class
-                                        : unactive_class
-                                }
-                            >
-                                <TbReportMedical className="h-6 w-6" />
-                                Book an Appointment
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="/dashboard/billing"
-                                className={
-                                    pathName == "billing"
-                                        ? active_class
-                                        : unactive_class
-                                }
-                            >
-                                <MdPayment className="h-6 w-6" />
-                                Billing & Payments
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                href="/dashboard/support"
-                                className={
-                                    pathName == "support"
-                                        ? active_class
-                                        : unactive_class
-                                }
-                            >
-                                <IoIosHelpCircleOutline className="h-6 w-6" />
-                                Help/Support
-                            </Link>
-                        </li>
-                    </ul>
+                    {session?.user?.userType == "user" && (
+                        <UserLinks
+                            active_class={active_class}
+                            unactive_class={unactive_class}
+                            pathName={pathName}
+                        />
+                    )}
+                    {session?.user?.userType == "doctor" && (
+                        <DoctorLinks
+                            active_class={active_class}
+                            unactive_class={unactive_class}
+                            pathName={pathName}
+                        />
+                    )}
                 </nav>
                 <Link
                     href="/"

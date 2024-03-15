@@ -1,15 +1,16 @@
 import React from "react";
 import { Sidebar } from "~/app/_components/ui/sidebar";
+import { getServerAuthSession } from "~/server/auth";
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     return (
-        <div className="dashboard">
-            <Sidebar />
-            <main className="main-content">{children}</main>
+        <div>
+            <Sidebar session={await getServerAuthSession()} />
+            <main className="ml-72">{children}</main>
         </div>
     );
 }

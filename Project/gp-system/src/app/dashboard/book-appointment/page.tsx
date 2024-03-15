@@ -7,20 +7,18 @@ import toast from "react-hot-toast";
 export default function BookAppointmentPage() {
     const clinic_selected = 2;
 
-    const [selectedDate, setSelectedDate] = useState<Date>(
-        new Date(),
-    );
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
     const available_appointments =
         api.appointment.getAvailableAppointments.useQuery({
             day: selectedDate,
             clinic_id: clinic_selected,
         });
-    
+
     const weekDays: Date[] = [];
-    
+
     for (let i = 0; i < 7; i++) {
-        weekDays.push(addDays(selectedDate, i-3));
+        weekDays.push(addDays(selectedDate, i - 3));
     }
 
     const [selectedSlotId, setSelectedSlotId] = useState<{
@@ -32,7 +30,11 @@ export default function BookAppointmentPage() {
 
     // Navigation functions for week
     const goToPreviousWeek = () => {
-        setSelectedDate(addDays(selectedDate, -7) < new Date() ? new Date() : addDays(selectedDate, -7)); 
+        setSelectedDate(
+            addDays(selectedDate, -7) < new Date()
+                ? new Date()
+                : addDays(selectedDate, -7),
+        );
     };
 
     const goToNextWeek = () => {
@@ -61,10 +63,16 @@ export default function BookAppointmentPage() {
     };
 
     return (
-        <div className="ml-64 flex-grow p-4">
+        <div className="flex-grow p-4">
             <h1 className="mb-4 text-xl font-bold">Book an Appointment</h1>
             <div className="mb-4 flex items-center justify-between">
-                <button onClick={goToPreviousWeek} className="px-4 py-2 text-xl disabled:opacity-0" disabled={addDays(selectedDate, -3) <= new Date()}>&larr;</button>
+                <button
+                    onClick={goToPreviousWeek}
+                    className="px-4 py-2 text-xl disabled:opacity-0"
+                    disabled={addDays(selectedDate, -3) <= new Date()}
+                >
+                    &larr;
+                </button>
                 {weekDays.map((day) => (
                     <button
                         key={day.getTime()}
@@ -82,7 +90,9 @@ export default function BookAppointmentPage() {
                         {format(day, "EEE dd MMM")}
                     </button>
                 ))}
-                <button onClick={goToNextWeek} className="px-4 py-2 text-xl">&rarr;</button>
+                <button onClick={goToNextWeek} className="px-4 py-2 text-xl">
+                    &rarr;
+                </button>
             </div>
             <div className="flex gap-4">
                 {available_appointments.status == "success" &&

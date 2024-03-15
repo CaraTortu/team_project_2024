@@ -143,11 +143,14 @@ export const appointmentRouter = createTRPCRouter({
 
             // TODO: Check the appointment is free
             const app = await db.query.appointment.findFirst({
-                where: and(eq(appointment.appointmentDate, input.appointmentDate), eq(appointment.doctorId, input.doctorId))
-            })
+                where: and(
+                    eq(appointment.appointmentDate, input.appointmentDate),
+                    eq(appointment.doctorId, input.doctorId),
+                ),
+            });
 
             if (app !== undefined) {
-                return { success: false, reason: "Appointment already booked" }
+                return { success: false, reason: "Appointment already booked" };
             }
 
             // TODO: Verify date and time

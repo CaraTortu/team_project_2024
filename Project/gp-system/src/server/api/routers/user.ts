@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
+} from "~/server/api/trpc";
 import { users } from "~/server/db/schema";
 import bcrypt from "bcrypt";
 import { randomString } from "~/server/utils";
@@ -40,4 +44,18 @@ export const userRouter = createTRPCRouter({
 
             return { success: true };
         }),
+    getUserInformation: protectedProcedure.query(
+        async ({ ctx: { session, db } }) => {
+            return db.query.users.findFirst({
+                where: eq(users.id, session.user.id),
+                columns: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    emailVerified: true,
+                    //TODO: DOB
+                }
+            })
+        },
+    ),
 });

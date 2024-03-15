@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Sidebar } from "~/app/_components/ui/sidebar";
 import { api } from "~/trpc/react";
 
 export default function GetAppointmentPage() {
@@ -32,9 +31,7 @@ export default function GetAppointmentPage() {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            <Sidebar />
-            {/* Add pl-64 to make padding equal to the sidebar width */}
-            <div className="flex-grow p-4 pl-72">
+            <div className="flex-grow p-4">
                 <h1 className="mb-4 text-xl font-bold">
                     Upcoming Appointments
                 </h1>
