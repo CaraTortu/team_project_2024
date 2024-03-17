@@ -72,9 +72,9 @@ const LoginPage: React.FC = () => {
         <div className="text-center">
           <p className="mt-2 text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="#" onClick={() => navigate('/register')} className="font-medium text-indigo-600 hover:text-indigo-500">
+            <button onClick={() => navigate('/register')} className="font-medium text-indigo-600 hover:text-indigo-500" style={{ background: 'none', border: 'none', padding: '0', font: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>
               Sign up
-            </a>
+            </button>
           </p>
         </div>
       </div>
