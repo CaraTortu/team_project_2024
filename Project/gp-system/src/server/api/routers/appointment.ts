@@ -163,10 +163,13 @@ export const appointmentRouter = createTRPCRouter({
 
             // TODO: Check the appointment is free
             const app = await db.query.appointment.findFirst({
-                where: and(and(
-                    eq(appointment.appointmentDate, input.appointmentDate),
-                    eq(appointment.doctorId, input.doctorId),
-                ), eq(appointment.isCancelled, false)),
+                where: and(
+                    and(
+                        eq(appointment.appointmentDate, input.appointmentDate),
+                        eq(appointment.doctorId, input.doctorId),
+                    ),
+                    eq(appointment.isCancelled, false),
+                ),
             });
 
             if (app !== undefined) {
@@ -199,11 +202,15 @@ export const appointmentRouter = createTRPCRouter({
                 .update(appointment)
                 .set({ isCancelled: true })
                 .where(
-                    and(and(
-                        eq(appointment.appointmentDate, input.appointDate),
-                        eq(appointment.userId, ctx.session.user.id),
-                    ), eq(appointment.isCancelled, false)),
-                ).returning();
+                    and(
+                        and(
+                            eq(appointment.appointmentDate, input.appointDate),
+                            eq(appointment.userId, ctx.session.user.id),
+                        ),
+                        eq(appointment.isCancelled, false),
+                    ),
+                )
+                .returning();
 
             if (appointment_deleted.length == 0) {
                 return {

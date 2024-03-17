@@ -9,11 +9,13 @@ export default function BookAppointmentPage() {
 
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-    const available_appointments =
-        api.appointment.getAvailableAppointments.useQuery({
+    let availableAppointments = api.appointment.getAvailableAppointments.useQuery(
+        {
             day: selectedDate,
             clinic_id: clinic_selected,
-        });
+        },
+    ).data;
+
 
     const weekDays: Date[] = [];
 
@@ -43,7 +45,7 @@ export default function BookAppointmentPage() {
 
     // Function to confirm the booking
     const confirmBooking = async () => {
-        if (!selectedSlotId || !selectedDate) return;
+        if (!selectedSlotId || !selectedDate || !availableAppointments) return;
 
         const res = await make_booking.mutateAsync({
             doctorId: selectedSlotId.doctor_id,
@@ -60,6 +62,21 @@ export default function BookAppointmentPage() {
 
         // Clear the selected slot and provide any further confirmation needed.
         setSelectedSlotId(null);
+
+        availableAppointments = {
+            success: availableAppointments.success,
+            data: availableAppointments.data!.map((appointment) => {
+                if (appointment.doctor_id == selectedSlotId.doctor_id) {
+                    appointment.available_appointments =
+                        appointment.available_appointments.map((item) => ({
+                            ...item,
+                            free: item.time !== selectedSlotId.time,
+                        }));
+                }
+
+                return appointment;
+            }),
+        };
     };
 
     return (
@@ -95,56 +112,54 @@ export default function BookAppointmentPage() {
                 </button>
             </div>
             <div className="flex justify-center gap-6">
-                {available_appointments.status == "success" &&
-                    available_appointments.data.data?.length == 0 && (
-                        <p className="mt-24 w-full text-center text-3xl">
-                            No appointments available for this day!
-                        </p>
-                    )}
-                {available_appointments.status == "success" &&
-                    available_appointments.data.data!.map((doctor) => (
-                        <div key={doctor.doctor_id} className="flex flex-col gap-6">
-                            {doctor.available_appointments.map((slot) => {
-                                const slotClassName = getSlotClassName(slot);
+                {availableAppointments?.data?.length == 0 && (
+                    <p className="mt-24 w-full text-center text-3xl">
+                        No appointments available for this day!
+                    </p>
+                )}
+                {availableAppointments?.data?.map((doctor) => (
+                    <div key={doctor.doctor_id} className="flex flex-col gap-6">
+                        {doctor.available_appointments.map((slot) => {
+                            const slotClassName = getSlotClassName(slot);
 
-                                function getSlotClassName(slot: {
-                                    time: Date;
-                                    free: boolean;
-                                }): string {
-                                    if (!slot.free) {
-                                        return "disabled:bg-red-300 cursor-not-allowed";
-                                    }
-
-                                    if (
-                                        slot.time == selectedSlotId?.time &&
-                                        doctor.doctor_id ==
-                                            selectedSlotId?.doctor_id
-                                    ) {
-                                        return "bg-blue-300";
-                                    } else {
-                                        return "bg-green-200 hover:bg-green-300";
-                                    }
+                            function getSlotClassName(slot: {
+                                time: Date;
+                                free: boolean;
+                            }): string {
+                                if (!slot.free) {
+                                    return "disabled:bg-red-300 cursor-not-allowed";
                                 }
 
-                                return (
-                                    <button
-                                        key={slot.time.getTime().toString()}
-                                        className={`flex  gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
-                                        onClick={() =>
-                                            setSelectedSlotId({
-                                                time: slot.time,
-                                                doctor_id: doctor.doctor_id,
-                                            })
-                                        }
-                                        disabled={!slot.free}
-                                    >
-                                        {format(slot.time, "dd/MM/yyyy hh:mm")}{" "}
-                                        -{doctor.doctor_name}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    ))}
+                                if (
+                                    slot.time == selectedSlotId?.time &&
+                                    doctor.doctor_id ==
+                                        selectedSlotId?.doctor_id
+                                ) {
+                                    return "bg-blue-300";
+                                } else {
+                                    return "bg-green-200 hover:bg-green-300";
+                                }
+                            }
+
+                            return (
+                                <button
+                                    key={slot.time.getTime().toString()}
+                                    className={`flex  gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
+                                    onClick={() =>
+                                        setSelectedSlotId({
+                                            time: slot.time,
+                                            doctor_id: doctor.doctor_id,
+                                        })
+                                    }
+                                    disabled={!slot.free}
+                                >
+                                    {format(slot.time, "dd/MM/yyyy hh:mm")} -
+                                    {doctor.doctor_name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                ))}
             </div>
             {selectedSlotId && (
                 <button

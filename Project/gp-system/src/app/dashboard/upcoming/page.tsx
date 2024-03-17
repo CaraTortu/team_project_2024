@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 
@@ -8,20 +8,29 @@ export default function GetAppointmentPage() {
     const cancel_appointment = api.appointment.cancelAppointment.useMutation();
 
     // useState hook to manage appointments
-    let upcoming_appointments = appointments.data?.map((appointment) => {
-        return {
-            id: appointment.id ?? "",
-            title: appointment.title ?? "",
-            doctor: appointment.doctorName ?? "",
-            date: appointment.appointmentDate ?? "",
-            details: appointment.details ?? "",
-        };
-    });
+    const [upcomingAppointments, setUpcomingAppointments] = useState(
+        appointments.data?.map((appointment) => {
+            return {
+                id: appointment.id,
+                title: appointment.title,
+                doctor: appointment.doctorName,
+                date: appointment.appointmentDate,
+                details: appointment.details,
+            };
+        }),
+    );
 
     const cancelAppointment = async (appointmentDate: Date) => {
-        const res = await cancel_appointment.mutateAsync({ appointDate: appointmentDate });
+        const res = await cancel_appointment.mutateAsync({
+            appointDate: appointmentDate,
+        });
         if (res.success) {
             toast.success("Appointment cancelled.");
+            setUpcomingAppointments(
+                upcomingAppointments?.filter(
+                    (app) => app.date != appointmentDate,
+                ),
+            );
             return;
         } else if (res.reason) {
             toast.error(res.reason);
@@ -35,8 +44,8 @@ export default function GetAppointmentPage() {
                 <h1 className="mb-4 text-xl font-bold">
                     Upcoming Appointments
                 </h1>
-                {upcoming_appointments &&
-                    upcoming_appointments.map((appointment) => (
+                {upcomingAppointments &&
+                    upcomingAppointments.map((appointment) => (
                         <div
                             key={appointment.id}
                             className="mb-4 rounded-lg bg-white p-4 shadow"
