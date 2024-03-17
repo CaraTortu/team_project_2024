@@ -1,9 +1,11 @@
 "use client";
 import React from "react";
+import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 
 export default function GetAppointmentPage() {
     const appointments = api.appointment.getAppointments.useQuery();
+    const cancel_appointment = api.appointment.cancelAppointment.useMutation();
 
     // useState hook to manage appointments
     let upcoming_appointments = appointments.data?.map((appointment) => {
@@ -11,22 +13,20 @@ export default function GetAppointmentPage() {
             id: appointment.id ?? "",
             title: appointment.title ?? "",
             doctor: appointment.doctorName ?? "",
-            date: appointment.appointmentDate.toLocaleString() ?? "",
+            date: appointment.appointmentDate ?? "",
             details: appointment.details ?? "",
-            isDetailVisible: false,
         };
     });
 
-    // Function to toggle the details visibility
-    const toggleDetails = (appointmentId: number) => {
-        upcoming_appointments = upcoming_appointments?.map((appointment) =>
-            appointment.id === appointmentId
-                ? {
-                      ...appointment,
-                      isDetailVisible: !appointment.isDetailVisible,
-                  }
-                : appointment,
-        );
+    const cancelAppointment = async (appointmentDate: Date) => {
+        const res = await cancel_appointment.mutateAsync({ appointDate: appointmentDate });
+        if (res.success) {
+            toast.success("Appointment cancelled.");
+            return;
+        } else if (res.reason) {
+            toast.error(res.reason);
+            return;
+        }
     };
 
     return (
@@ -50,28 +50,22 @@ export default function GetAppointmentPage() {
                                         With {appointment.doctor}
                                     </p>
                                     <p className="text-gray-600">
-                                        {appointment.date}
+                                        {appointment.date.toLocaleString()}
                                     </p>
-                                    {/* Toggle button */}
                                     <button
                                         onClick={() =>
-                                            toggleDetails(appointment.id)
+                                            cancelAppointment(appointment.date)
                                         }
                                         className="mt-2 text-blue-500 hover:text-blue-600"
                                     >
-                                        {appointment.isDetailVisible
-                                            ? "Hide Details"
-                                            : "Show Details"}
+                                        Cancel appointment
                                     </button>
                                 </div>
                             </div>
                             {/* Details section */}
-                            {appointment.isDetailVisible && (
-                                <div className="mt-2 text-gray-600">
-                                    <p>Details: {appointment.details}</p>
-                                    {/* Additional details can be added here */}
-                                </div>
-                            )}
+                            <div className="mt-2 text-gray-600">
+                                <p>Details: {appointment.details}</p>
+                            </div>
                         </div>
                     ))}
             </div>

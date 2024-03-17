@@ -54,8 +54,8 @@ export const userRouter = createTRPCRouter({
                     email: true,
                     emailVerified: true,
                     //TODO: DOB
-                }
-            })
+                },
+            });
         },
     ),
 });

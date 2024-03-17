@@ -42,16 +42,16 @@ export default function BookAppointmentPage() {
     };
 
     // Function to confirm the booking
-    const confirmBooking = () => {
+    const confirmBooking = async () => {
         if (!selectedSlotId || !selectedDate) return;
 
-        make_booking.mutate({
+        const res = await make_booking.mutateAsync({
             doctorId: selectedSlotId.doctor_id,
             appointmentDate: selectedSlotId.time,
         });
 
-        if (!make_booking.data?.success && make_booking.data?.reason) {
-            toast.error(make_booking.data.reason);
+        if (!res.success && res.reason) {
+            toast.error(res.reason);
             return;
         }
 
@@ -94,16 +94,29 @@ export default function BookAppointmentPage() {
                     &rarr;
                 </button>
             </div>
-            <div className="flex gap-4">
+            <div className="flex justify-center gap-6">
+                {available_appointments.status == "success" &&
+                    available_appointments.data.data?.length == 0 && (
+                        <p className="mt-24 w-full text-center text-3xl">
+                            No appointments available for this day!
+                        </p>
+                    )}
                 {available_appointments.status == "success" &&
                     available_appointments.data.data!.map((doctor) => (
-                        <div className="flex flex-col gap-4">
+                        <div key={doctor.doctor_id} className="flex flex-col gap-6">
                             {doctor.available_appointments.map((slot) => {
                                 const slotClassName = getSlotClassName(slot);
 
-                                function getSlotClassName(slot: Date): string {
+                                function getSlotClassName(slot: {
+                                    time: Date;
+                                    free: boolean;
+                                }): string {
+                                    if (!slot.free) {
+                                        return "disabled:bg-red-300 cursor-not-allowed";
+                                    }
+
                                     if (
-                                        slot == selectedSlotId?.time &&
+                                        slot.time == selectedSlotId?.time &&
                                         doctor.doctor_id ==
                                             selectedSlotId?.doctor_id
                                     ) {
@@ -115,17 +128,18 @@ export default function BookAppointmentPage() {
 
                                 return (
                                     <button
-                                        key={slot.getTime().toString()}
-                                        className={`flex gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
+                                        key={slot.time.getTime().toString()}
+                                        className={`flex  gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
                                         onClick={() =>
                                             setSelectedSlotId({
-                                                time: slot,
+                                                time: slot.time,
                                                 doctor_id: doctor.doctor_id,
                                             })
                                         }
+                                        disabled={!slot.free}
                                     >
-                                        {format(slot, "dd/MM/yyyy hh:mm")} -
-                                        {doctor.doctor_name}
+                                        {format(slot.time, "dd/MM/yyyy hh:mm")}{" "}
+                                        -{doctor.doctor_name}
                                     </button>
                                 );
                             })}
