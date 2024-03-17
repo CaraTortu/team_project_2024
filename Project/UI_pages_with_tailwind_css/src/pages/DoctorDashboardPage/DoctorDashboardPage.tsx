@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DoctorSidebar from '../../components/DoctorSidebar/DoctorSidebar';
-import { format, startOfWeek, addDays, isToday } from 'date-fns';
+import { format, addDays} from 'date-fns';
 
 type PatientInfo = {
   id: string;
@@ -22,7 +22,7 @@ const today = new Date();
 const mockAppointments: Appointment[] = [
   {
     id: 1,
-    time: `${format(today, 'yyyy-MM-dd')}T09:00`,
+    time: `${format(today, 'yyyy-MM-dd')} 9:00`,
     patient: {
       id: '12345',
       name: 'John Doe',
@@ -33,7 +33,7 @@ const mockAppointments: Appointment[] = [
   },
   {
     id: 2,
-    time: `${format(today, 'yyyy-MM-dd')}T09:15`,
+    time: `${format(today, 'yyyy-MM-dd')} 9:15`,
     patient: {
       id: '23456',
       name: 'Jane Smith',

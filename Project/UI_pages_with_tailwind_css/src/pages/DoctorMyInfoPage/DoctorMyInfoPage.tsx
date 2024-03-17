@@ -52,7 +52,20 @@ const DoctorMyInfoPage = () => {
             {/* Additional Information */}
             <section className="mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Additional Information</h2>
-              {/* Similar structure for Additional Information fields... */}
+              <section className="mb-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Gender</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.gender}</div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Additional name</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.additionalName}</div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Date of birth</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.dob}</div>
+              </div>
+            </section>
             </section>
 
             {/* Contact Information */}
