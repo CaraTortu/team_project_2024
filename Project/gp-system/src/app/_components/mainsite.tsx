@@ -1,6 +1,4 @@
 "use client";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { TopBar } from "~/app/_components/ui/topbar";
 import Link from "next/link";
 import { MdAccessibility, MdSchedule, MdSecurity } from "react-icons/md";
