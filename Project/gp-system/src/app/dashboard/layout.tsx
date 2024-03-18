@@ -10,7 +10,7 @@ export default async function RootLayout({
     return (
         <div>
             <Sidebar session={await getServerAuthSession()} />
-            <main className="ml-72">{children}</main>
+            <main className="ml-64">{children}</main>
         </div>
     );
 }

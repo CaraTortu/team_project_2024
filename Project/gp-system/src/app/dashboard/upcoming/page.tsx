@@ -1,24 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 
 export default function GetAppointmentPage() {
-    const appointments = api.appointment.getAppointments.useQuery();
+    let upcomingAppointments = api.appointment.getAppointments.useQuery();
     const cancel_appointment = api.appointment.cancelAppointment.useMutation();
-
-    // useState hook to manage appointments
-    const [upcomingAppointments, setUpcomingAppointments] = useState(
-        appointments.data?.map((appointment) => {
-            return {
-                id: appointment.id,
-                title: appointment.title,
-                doctor: appointment.doctorName,
-                date: appointment.appointmentDate,
-                details: appointment.details,
-            };
-        }),
-    );
 
     const cancelAppointment = async (appointmentDate: Date) => {
         const res = await cancel_appointment.mutateAsync({
@@ -26,11 +13,8 @@ export default function GetAppointmentPage() {
         });
         if (res.success) {
             toast.success("Appointment cancelled.");
-            setUpcomingAppointments(
-                upcomingAppointments?.filter(
-                    (app) => app.date != appointmentDate,
-                ),
-            );
+
+            upcomingAppointments.refetch();
             return;
         } else if (res.reason) {
             toast.error(res.reason);
@@ -39,13 +23,16 @@ export default function GetAppointmentPage() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen w-full bg-gray-100">
             <div className="flex-grow p-4">
-                <h1 className="mb-4 text-xl font-bold">
+                <h1 className="mb-8 text-xl font-bold">
                     Upcoming Appointments
                 </h1>
-                {upcomingAppointments &&
-                    upcomingAppointments.map((appointment) => (
+                {upcomingAppointments.isLoading && (
+                    <div>Loading appointments...</div>
+                )}
+                {upcomingAppointments.isSuccess &&
+                    upcomingAppointments.data!.map((appointment) => (
                         <div
                             key={appointment.id}
                             className="mb-4 rounded-lg bg-white p-4 shadow"
@@ -55,15 +42,17 @@ export default function GetAppointmentPage() {
                                     <h2 className="text-lg font-bold">
                                         {appointment.title}
                                     </h2>
-                                    <p className="text-gray-600">
-                                        With {appointment.doctor}
+                                    <p className="text-xl font-bold text-gray-600">
+                                        {appointment.doctorName}
                                     </p>
                                     <p className="text-gray-600">
-                                        {appointment.date.toLocaleString()}
+                                        {appointment.appointmentDate.toLocaleString()}
                                     </p>
                                     <button
                                         onClick={() =>
-                                            cancelAppointment(appointment.date)
+                                            cancelAppointment(
+                                                appointment.appointmentDate,
+                                            )
                                         }
                                         className="mt-2 text-blue-500 hover:text-blue-600"
                                     >

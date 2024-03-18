@@ -5,17 +5,15 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 
 export default function BookAppointmentPage() {
-    const clinic_selected = 2;
+    const clinic_selected = 3;
 
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-    let availableAppointments = api.appointment.getAvailableAppointments.useQuery(
-        {
+    let availableAppointments =
+        api.appointment.getAvailableAppointments.useQuery({
             day: selectedDate,
             clinic_id: clinic_selected,
-        },
-    ).data;
-
+        }).data;
 
     const weekDays: Date[] = [];
 
@@ -70,7 +68,10 @@ export default function BookAppointmentPage() {
                     appointment.available_appointments =
                         appointment.available_appointments.map((item) => ({
                             ...item,
-                            free: item.time !== selectedSlotId.time,
+                            free:
+                                item.time == selectedSlotId.time
+                                    ? false
+                                    : item.free,
                         }));
                 }
 
@@ -82,7 +83,7 @@ export default function BookAppointmentPage() {
     return (
         <div className="flex-grow p-4">
             <h1 className="mb-4 text-xl font-bold">Book an Appointment</h1>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between gap-2">
                 <button
                     onClick={goToPreviousWeek}
                     className="px-4 py-2 text-xl disabled:opacity-0"
@@ -93,10 +94,14 @@ export default function BookAppointmentPage() {
                 {weekDays.map((day) => (
                     <button
                         key={day.getTime()}
-                        disabled={isBefore(day, new Date()) && !isToday(day)}
+                        disabled={
+                            (isBefore(day, new Date()) && !isToday(day)) ||
+                            [0, 6].includes(day.getDay())
+                        }
                         onClick={() => setSelectedDate(day)}
-                        className={`mx-1 px-4 py-2 ${
-                            isBefore(day, new Date()) && !isToday(day)
+                        className={`rounded-lg px-4 py-2 ${
+                            (isBefore(day, new Date()) && !isToday(day)) ||
+                            [0, 6].includes(day.getDay())
                                 ? "cursor-not-allowed bg-gray-300"
                                 : selectedDate.toDateString() ===
                                     day.toDateString()

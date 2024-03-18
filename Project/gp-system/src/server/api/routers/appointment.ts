@@ -25,7 +25,12 @@ export const appointmentRouter = createTRPCRouter({
                 ),
             )
             .leftJoin(users, eq(users.id, appointment.doctorId))
-            .execute();
+            .execute()
+            .then((res) =>
+                res.sort((a, b) =>
+                    a.appointmentDate < b.appointmentDate ? -1 : 1,
+                ),
+            );
     }),
     getAvailableAppointments: protectedProcedure
         .input(z.object({ day: z.date(), clinic_id: z.number().min(0) }))
