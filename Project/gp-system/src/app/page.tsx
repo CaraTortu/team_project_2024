@@ -1,15 +1,8 @@
-"use client";
-import React from "react";
-import { TopBar } from "~/app/_components/ui/topbar";
+import { getServerAuthSession } from "~/server/auth";
+import { MainPage } from "./_components/mainsite";
 
-export default function mainPage() {
-    return (
-        <div>
-            <TopBar />
-            <div className="greeting-message">
-                Welcome to the GP Appointment System!
-            </div>
-            {/* Additional content of the main page goes here */}
-        </div>
-    );
+export default async function Main() {
+    const session = await getServerAuthSession();
+
+    return <MainPage session={session} />;
 }

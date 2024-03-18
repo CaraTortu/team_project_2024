@@ -81,7 +81,7 @@ export default function BookAppointmentPage() {
     };
 
     return (
-        <div className="flex-grow p-4">
+        <div className="flex h-[100vh] flex-grow flex-col p-4">
             <h1 className="mb-4 text-xl font-bold">Book an Appointment</h1>
             <div className="mb-4 flex items-center justify-between gap-2">
                 <button
@@ -99,7 +99,7 @@ export default function BookAppointmentPage() {
                             [0, 6].includes(day.getDay())
                         }
                         onClick={() => setSelectedDate(day)}
-                        className={`rounded-lg px-4 py-2 ${
+                        className={`rounded-lg px-4 py-2 duration-300 ${
                             (isBefore(day, new Date()) && !isToday(day)) ||
                             [0, 6].includes(day.getDay())
                                 ? "cursor-not-allowed bg-gray-300"
@@ -123,7 +123,7 @@ export default function BookAppointmentPage() {
                     </p>
                 )}
                 {availableAppointments?.data?.map((doctor) => (
-                    <div key={doctor.doctor_id} className="flex flex-col gap-6">
+                    <div key={doctor.doctor_id} className="flex flex-col gap-2">
                         {doctor.available_appointments.map((slot) => {
                             const slotClassName = getSlotClassName(slot);
 
@@ -149,7 +149,7 @@ export default function BookAppointmentPage() {
                             return (
                                 <button
                                     key={slot.time.getTime().toString()}
-                                    className={`flex  gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
+                                    className={`flex gap-2 rounded-lg border p-2 text-left duration-300 ${slotClassName}`}
                                     onClick={() =>
                                         setSelectedSlotId({
                                             time: slot.time,
@@ -158,7 +158,8 @@ export default function BookAppointmentPage() {
                                     }
                                     disabled={!slot.free}
                                 >
-                                    {format(slot.time, "dd/MM/yyyy hh:mm")} -
+                                    {format(slot.time, "hh:mm")}
+                                    <p>-</p>
                                     {doctor.doctor_name}
                                 </button>
                             );
@@ -166,15 +167,17 @@ export default function BookAppointmentPage() {
                     </div>
                 ))}
             </div>
-            {selectedSlotId && (
-                <button
-                    onClick={confirmBooking}
-                    className="fixed bottom-0 left-1/2 mb-4 -translate-x-1/2 transform rounded-md bg-blue-500 px-6 py-2 text-white"
-                    style={{ zIndex: 1000 }}
-                >
-                    Select This Appointment
-                </button>
-            )}
+            <div className="flex w-full flex-grow items-end justify-center">
+                {selectedSlotId && (
+                    <button
+                        onClick={confirmBooking}
+                        className="mt-4 rounded-md bg-blue-500 px-6 py-2 text-white"
+                        style={{ zIndex: 1000 }}
+                    >
+                        Select This Appointment
+                    </button>
+                )}
+            </div>
         </div>
     );
 }
