@@ -5,15 +5,15 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 
 export default function BookAppointmentPage() {
-    const clinic_selected = 2;
+    const clinic_selected = 3;
 
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-    const available_appointments =
+    let availableAppointments =
         api.appointment.getAvailableAppointments.useQuery({
             day: selectedDate,
             clinic_id: clinic_selected,
-        });
+        }).data;
 
     const weekDays: Date[] = [];
 
@@ -42,16 +42,16 @@ export default function BookAppointmentPage() {
     };
 
     // Function to confirm the booking
-    const confirmBooking = () => {
-        if (!selectedSlotId || !selectedDate) return;
+    const confirmBooking = async () => {
+        if (!selectedSlotId || !selectedDate || !availableAppointments) return;
 
-        make_booking.mutate({
+        const res = await make_booking.mutateAsync({
             doctorId: selectedSlotId.doctor_id,
             appointmentDate: selectedSlotId.time,
         });
 
-        if (!make_booking.data?.success && make_booking.data?.reason) {
-            toast.error(make_booking.data.reason);
+        if (!res.success && res.reason) {
+            toast.error(res.reason);
             return;
         }
 
@@ -60,12 +60,30 @@ export default function BookAppointmentPage() {
 
         // Clear the selected slot and provide any further confirmation needed.
         setSelectedSlotId(null);
+
+        availableAppointments = {
+            success: availableAppointments.success,
+            data: availableAppointments.data!.map((appointment) => {
+                if (appointment.doctor_id == selectedSlotId.doctor_id) {
+                    appointment.available_appointments =
+                        appointment.available_appointments.map((item) => ({
+                            ...item,
+                            free:
+                                item.time == selectedSlotId.time
+                                    ? false
+                                    : item.free,
+                        }));
+                }
+
+                return appointment;
+            }),
+        };
     };
 
     return (
         <div className="flex-grow p-4">
             <h1 className="mb-4 text-xl font-bold">Book an Appointment</h1>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between gap-2">
                 <button
                     onClick={goToPreviousWeek}
                     className="px-4 py-2 text-xl disabled:opacity-0"
@@ -76,10 +94,14 @@ export default function BookAppointmentPage() {
                 {weekDays.map((day) => (
                     <button
                         key={day.getTime()}
-                        disabled={isBefore(day, new Date()) && !isToday(day)}
+                        disabled={
+                            (isBefore(day, new Date()) && !isToday(day)) ||
+                            [0, 6].includes(day.getDay())
+                        }
                         onClick={() => setSelectedDate(day)}
-                        className={`mx-1 px-4 py-2 ${
-                            isBefore(day, new Date()) && !isToday(day)
+                        className={`rounded-lg px-4 py-2 ${
+                            (isBefore(day, new Date()) && !isToday(day)) ||
+                            [0, 6].includes(day.getDay())
                                 ? "cursor-not-allowed bg-gray-300"
                                 : selectedDate.toDateString() ===
                                     day.toDateString()
@@ -94,43 +116,55 @@ export default function BookAppointmentPage() {
                     &rarr;
                 </button>
             </div>
-            <div className="flex gap-4">
-                {available_appointments.status == "success" &&
-                    available_appointments.data.data!.map((doctor) => (
-                        <div className="flex flex-col gap-4">
-                            {doctor.available_appointments.map((slot) => {
-                                const slotClassName = getSlotClassName(slot);
+            <div className="flex justify-center gap-6">
+                {availableAppointments?.data?.length == 0 && (
+                    <p className="mt-24 w-full text-center text-3xl">
+                        No appointments available for this day!
+                    </p>
+                )}
+                {availableAppointments?.data?.map((doctor) => (
+                    <div key={doctor.doctor_id} className="flex flex-col gap-6">
+                        {doctor.available_appointments.map((slot) => {
+                            const slotClassName = getSlotClassName(slot);
 
-                                function getSlotClassName(slot: Date): string {
-                                    if (
-                                        slot == selectedSlotId?.time &&
-                                        doctor.doctor_id ==
-                                            selectedSlotId?.doctor_id
-                                    ) {
-                                        return "bg-blue-300";
-                                    } else {
-                                        return "bg-green-200 hover:bg-green-300";
-                                    }
+                            function getSlotClassName(slot: {
+                                time: Date;
+                                free: boolean;
+                            }): string {
+                                if (!slot.free) {
+                                    return "disabled:bg-red-300 cursor-not-allowed";
                                 }
 
-                                return (
-                                    <button
-                                        key={slot.getTime().toString()}
-                                        className={`flex gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
-                                        onClick={() =>
-                                            setSelectedSlotId({
-                                                time: slot,
-                                                doctor_id: doctor.doctor_id,
-                                            })
-                                        }
-                                    >
-                                        {format(slot, "dd/MM/yyyy hh:mm")} -
-                                        {doctor.doctor_name}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    ))}
+                                if (
+                                    slot.time == selectedSlotId?.time &&
+                                    doctor.doctor_id ==
+                                        selectedSlotId?.doctor_id
+                                ) {
+                                    return "bg-blue-300";
+                                } else {
+                                    return "bg-green-200 hover:bg-green-300";
+                                }
+                            }
+
+                            return (
+                                <button
+                                    key={slot.time.getTime().toString()}
+                                    className={`flex  gap-2 rounded-lg border p-2 text-left ${slotClassName}`}
+                                    onClick={() =>
+                                        setSelectedSlotId({
+                                            time: slot.time,
+                                            doctor_id: doctor.doctor_id,
+                                        })
+                                    }
+                                    disabled={!slot.free}
+                                >
+                                    {format(slot.time, "dd/MM/yyyy hh:mm")} -
+                                    {doctor.doctor_name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                ))}
             </div>
             {selectedSlotId && (
                 <button

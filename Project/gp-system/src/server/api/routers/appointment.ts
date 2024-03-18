@@ -13,15 +13,24 @@ export const appointmentRouter = createTRPCRouter({
                 appointmentDate: appointment.appointmentDate,
                 paymentAmount: appointment.paymentAmount,
                 paymentStatus: appointment.paymentStatus,
-                isCancelled: appointment.isCancelled,
                 title: appointment.title,
                 details: appointment.details,
                 doctorName: users.name,
             })
             .from(appointment)
-            .where(eq(appointment.userId, session.user.id))
+            .where(
+                and(
+                    eq(appointment.userId, session.user.id),
+                    eq(appointment.isCancelled, false),
+                ),
+            )
             .leftJoin(users, eq(users.id, appointment.doctorId))
-            .execute();
+            .execute()
+            .then((res) =>
+                res.sort((a, b) =>
+                    a.appointmentDate < b.appointmentDate ? -1 : 1,
+                ),
+            );
     }),
     getAvailableAppointments: protectedProcedure
         .input(z.object({ day: z.date(), clinic_id: z.number().min(0) }))
@@ -36,6 +45,10 @@ export const appointmentRouter = createTRPCRouter({
                 input.day.getMonth(),
                 input.day.getDate() + 1,
             );
+
+            if ([0, 6].includes(input.day.getDay())) {
+                return { success: true, data: [] };
+            }
 
             const clinic_doctors = await db
                 .select({
@@ -60,10 +73,13 @@ export const appointmentRouter = createTRPCRouter({
             const appointmentsBooked = await db.query.appointment.findMany({
                 where: and(
                     and(
-                        inArray(appointment.doctorId, doctor_ids),
-                        gt(appointment.appointmentDate, startDate),
+                        and(
+                            inArray(appointment.doctorId, doctor_ids),
+                            gt(appointment.appointmentDate, startDate),
+                        ),
+                        lt(appointment.appointmentDate, endDate),
+                        eq(appointment.isCancelled, false),
                     ),
-                    lt(appointment.appointmentDate, endDate),
                 ),
                 with: {
                     doctor: {
@@ -102,13 +118,15 @@ export const appointmentRouter = createTRPCRouter({
                 return {
                     doctor_id: doctor.id,
                     doctor_name: doctor.name,
-                    available_appointments: availableAppointments.filter(
-                        (appointment) =>
-                            !appointment_booked_doctor
+                    available_appointments: availableAppointments.map(
+                        (appointment) => ({
+                            free: !appointment_booked_doctor
                                 .map((a) =>
                                     a.appointmentDate.getTime().toString(),
                                 )
                                 .includes(appointment.getTime().toString()),
+                            time: appointment,
+                        }),
                     ),
                 };
             });
@@ -124,6 +142,13 @@ export const appointmentRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ ctx, input }) => {
+            if ([0, 6].includes(input.appointmentDate.getDay())) {
+                return {
+                    success: false,
+                    reason: "You cannot book an appointment on saturday or sunday",
+                };
+            }
+
             const patientId =
                 ctx.session.user.userType == "user"
                     ? ctx.session.user.id
@@ -144,8 +169,11 @@ export const appointmentRouter = createTRPCRouter({
             // TODO: Check the appointment is free
             const app = await db.query.appointment.findFirst({
                 where: and(
-                    eq(appointment.appointmentDate, input.appointmentDate),
-                    eq(appointment.doctorId, input.doctorId),
+                    and(
+                        eq(appointment.appointmentDate, input.appointmentDate),
+                        eq(appointment.doctorId, input.doctorId),
+                    ),
+                    eq(appointment.isCancelled, false),
                 ),
             });
 
@@ -169,6 +197,32 @@ export const appointmentRouter = createTRPCRouter({
                     paymentAmount: 60,
                 })
                 .execute();
+
+            return { success: true };
+        }),
+    cancelAppointment: protectedProcedure
+        .input(z.object({ appointDate: z.date() }))
+        .mutation(async ({ ctx, input }) => {
+            const appointment_deleted = await ctx.db
+                .update(appointment)
+                .set({ isCancelled: true })
+                .where(
+                    and(
+                        and(
+                            eq(appointment.appointmentDate, input.appointDate),
+                            eq(appointment.userId, ctx.session.user.id),
+                        ),
+                        eq(appointment.isCancelled, false),
+                    ),
+                )
+                .returning();
+
+            if (appointment_deleted.length == 0) {
+                return {
+                    success: false,
+                    reason: "This appointment does not exist or has already been cancelled",
+                };
+            }
 
             return { success: true };
         }),

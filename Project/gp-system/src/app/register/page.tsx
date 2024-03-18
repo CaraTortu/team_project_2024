@@ -40,7 +40,7 @@ const RegisterPage: React.FC = () => {
             return;
         }
 
-        await register.mutateAsync({
+        const res = await register.mutateAsync({
             title: formData.title,
             fname: formData.firstName,
             lname: formData.surname,
@@ -48,13 +48,8 @@ const RegisterPage: React.FC = () => {
             password: formData.password,
         });
 
-        if (!register.data) {
-            toast.error("Something went wrong, please try again");
-            return;
-        }
-
-        if (!register.data.success && register.data.reason) {
-            toast.error(register.data.reason);
+        if (!res.success && res.reason) {
+            toast.error(res.reason);
             return;
         }
 

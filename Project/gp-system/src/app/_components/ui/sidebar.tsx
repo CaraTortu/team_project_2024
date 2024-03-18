@@ -132,14 +132,12 @@ const DoctorLinks: React.FC<{
 };
 
 interface SideBarProps {
-   session: Session | null;
+    session: Session | null;
 }
 
 const Sidebar: React.FC<SideBarProps> = ({ session }) => {
     const pathNames = usePathname().split("/");
     const pathName = pathNames[pathNames.length - 1] ?? "";
-
-    console.log(session)
 
     const unactive_class =
         "block py-2 px-4 hover:bg-blue-700 duration-300 flex gap-2 items-center";
