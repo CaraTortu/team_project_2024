@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react";
 
 const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
     return (
-        <div className="fixed top-0 flex h-16 w-full items-center bg-blue-100 border-b border-blue-600 bg-opacity-60 px-4 text-white backdrop-blur">
+        <div className="fixed top-0 flex h-16 w-full items-center border-b border-blue-600 bg-blue-100 bg-opacity-60 px-4 text-white backdrop-blur">
             <img
                 src="/logo.png"
                 className="ml-4 h-12 w-12 rounded-full shadow-lg"
@@ -65,7 +65,7 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                     </Link>
                 )}
                 {session?.user && (
-                    <div className="font-sans text-black mr-4">
+                    <div className="mr-4 font-sans text-black">
                         Welcome{" "}
                         <span className="text-lg font-bold">
                             {session.user.name}

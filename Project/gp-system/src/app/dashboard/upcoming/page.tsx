@@ -23,19 +23,19 @@ export default function GetAppointmentPage() {
     };
 
     return (
-        <div className="flex h-screen w-full bg-gray-100">
-            <div className="flex-grow p-4">
-                <h1 className="mb-8 text-xl font-bold">
-                    Upcoming Appointments
-                </h1>
+        <div className="flex w-full">
+            <div className="flex-grow px-4">
                 {upcomingAppointments.isLoading && (
-                    <div>Loading appointments...</div>
+                    <p className="mt-12 w-full text-2xl font-semibold text-gray-600 text-center">Loading appointments...</p>
+                )}
+                {upcomingAppointments.isSuccess && upcomingAppointments.data.length == 0 && (
+                    <p className="mt-12 w-full text-2xl font-semibold text-gray-600 text-center">You have no upcoming appointments</p>
                 )}
                 {upcomingAppointments.isSuccess &&
                     upcomingAppointments.data!.map((appointment) => (
                         <div
                             key={appointment.id}
-                            className="mb-4 rounded-lg bg-white p-4 shadow"
+                            className="mb-4 rounded-lg p-4 shadow-xl bg-slate-100"
                         >
                             <div className="flex items-center justify-between">
                                 <div>

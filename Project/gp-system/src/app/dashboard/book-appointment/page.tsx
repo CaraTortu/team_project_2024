@@ -24,7 +24,10 @@ export default function BookAppointmentPage() {
     const [selectedSlotId, setSelectedSlotId] = useState<{
         time: Date;
         doctor_id: string;
+        doctor_name: string;
     } | null>(null);
+
+    const [visitReason, setVisitReason] = useState<string>("");
 
     const make_booking = api.appointment.createAppointment.useMutation();
 
@@ -35,19 +38,27 @@ export default function BookAppointmentPage() {
                 ? new Date()
                 : addDays(selectedDate, -7),
         );
+        setSelectedSlotId(null);
     };
 
     const goToNextWeek = () => {
         setSelectedDate(addDays(selectedDate, 7));
+        setSelectedSlotId(null);
     };
 
     // Function to confirm the booking
     const confirmBooking = async () => {
         if (!selectedSlotId || !selectedDate || !availableAppointments) return;
 
+        if (!visitReason) {
+            toast.error("You need to supply a reason for your visit")
+            return;
+        }
+
         const res = await make_booking.mutateAsync({
             doctorId: selectedSlotId.doctor_id,
             appointmentDate: selectedSlotId.time,
+            details: visitReason
         });
 
         if (!res.success && res.reason) {
@@ -81,9 +92,8 @@ export default function BookAppointmentPage() {
     };
 
     return (
-        <div className="flex h-[100vh] flex-grow flex-col p-4">
-            <h1 className="mb-4 text-xl font-bold">Book an Appointment</h1>
-            <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex flex-grow flex-col px-4">
+            <div className="mb-8 flex items-center justify-between gap-2">
                 <button
                     onClick={goToPreviousWeek}
                     className="px-4 py-2 text-xl disabled:opacity-0"
@@ -98,7 +108,10 @@ export default function BookAppointmentPage() {
                             (isBefore(day, new Date()) && !isToday(day)) ||
                             [0, 6].includes(day.getDay())
                         }
-                        onClick={() => setSelectedDate(day)}
+                        onClick={() => {
+                            setSelectedDate(day);
+                            setSelectedSlotId(null);
+                        }}
                         className={`rounded-lg px-4 py-2 duration-300 ${
                             (isBefore(day, new Date()) && !isToday(day)) ||
                             [0, 6].includes(day.getDay())
@@ -116,14 +129,17 @@ export default function BookAppointmentPage() {
                     &rarr;
                 </button>
             </div>
-            <div className="flex justify-center gap-6">
+            <div className="flex justify-center gap-6 duration-300">
                 {availableAppointments?.data?.length == 0 && (
                     <p className="mt-24 w-full text-center text-3xl">
                         No appointments available for this day!
                     </p>
                 )}
                 {availableAppointments?.data?.map((doctor) => (
-                    <div key={doctor.doctor_id} className="flex flex-col gap-2">
+                    <div
+                        key={doctor.doctor_id}
+                        className="flex max-w-fit flex-grow flex-col gap-2"
+                    >
                         {doctor.available_appointments.map((slot) => {
                             const slotClassName = getSlotClassName(slot);
 
@@ -132,7 +148,7 @@ export default function BookAppointmentPage() {
                                 free: boolean;
                             }): string {
                                 if (!slot.free) {
-                                    return "disabled:bg-red-300 cursor-not-allowed";
+                                    return "disabled:bg-gray-300 cursor-not-allowed";
                                 }
 
                                 if (
@@ -140,9 +156,9 @@ export default function BookAppointmentPage() {
                                     doctor.doctor_id ==
                                         selectedSlotId?.doctor_id
                                 ) {
-                                    return "bg-blue-300";
+                                    return "bg-green-300";
                                 } else {
-                                    return "bg-green-200 hover:bg-green-300";
+                                    return "bg-blue-400 bg-opacity-35 hover:bg-opacity-70";
                                 }
                             }
 
@@ -154,6 +170,8 @@ export default function BookAppointmentPage() {
                                         setSelectedSlotId({
                                             time: slot.time,
                                             doctor_id: doctor.doctor_id,
+                                            doctor_name:
+                                                doctor.doctor_name ?? "",
                                         })
                                     }
                                     disabled={!slot.free}
@@ -166,16 +184,34 @@ export default function BookAppointmentPage() {
                         })}
                     </div>
                 ))}
-            </div>
-            <div className="flex w-full flex-grow items-end justify-center">
                 {selectedSlotId && (
-                    <button
-                        onClick={confirmBooking}
-                        className="mt-4 rounded-md bg-blue-500 px-6 py-2 text-white"
-                        style={{ zIndex: 1000 }}
-                    >
-                        Select This Appointment
-                    </button>
+                    <div className="flex flex-col justify-center gap-2 p-4 pl-12 text-black">
+                        <p className="text-2xl font-bold">
+                            Appointment information
+                        </p>
+                        <div className="text-md font-semibold text-gray-600">
+                            <p>Doctor: {selectedSlotId.doctor_name}</p>
+                            <p>Date: {selectedSlotId.time.toUTCString()}</p>
+                        </div>
+                        <div className="mt-12 flex flex-col gap-2">
+                            <p className="font-semibold text-gray-800">
+                                Reason for visit:
+                            </p>
+                            <textarea
+                                className="text-md h-32 resize-none rounded-lg bg-blue-200 bg-opacity-50 px-3 py-2 shadow-xl placeholder:italic"
+                                placeholder="Describe the issue here"
+                                content={visitReason}
+                                onChange={(e) => setVisitReason(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            onClick={confirmBooking}
+                            className="mt-4 rounded-md bg-blue-500 px-6 py-2 text-white"
+                            style={{ zIndex: 1000 }}
+                        >
+                            Select This Appointment
+                        </button>
+                    </div>
                 )}
             </div>
         </div>

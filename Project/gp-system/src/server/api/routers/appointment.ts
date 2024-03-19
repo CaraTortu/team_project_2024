@@ -139,6 +139,7 @@ export const appointmentRouter = createTRPCRouter({
                 patientId: z.string().min(1).max(255).optional(),
                 doctorId: z.string().min(1).max(255),
                 appointmentDate: z.date(),
+                details: z.string().min(1).max(1024)
             }),
         )
         .mutation(async ({ ctx, input }) => {
@@ -169,24 +170,19 @@ export const appointmentRouter = createTRPCRouter({
             // TODO: Check the appointment is free
             const app = await db.query.appointment.findFirst({
                 where: and(
-                    and(
                         eq(appointment.appointmentDate, input.appointmentDate),
-                        eq(appointment.doctorId, input.doctorId),
-                    ),
                     eq(appointment.isCancelled, false),
                 ),
             });
 
             if (app !== undefined) {
-                return { success: false, reason: "Appointment already booked" };
+                return { success: false, reason: "You have an appointment booked for this time already" };
             }
-
-            // TODO: Verify date and time
-            // TODO: Add payment amount
 
             await db
                 .insert(appointment)
                 .values({
+                    details: input.details,
                     userId: patientId,
                     doctorId: doctor.id,
                     createdById:

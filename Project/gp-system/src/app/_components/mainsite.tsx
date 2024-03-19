@@ -72,11 +72,11 @@ const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
         },
     ];
 
-   return (
+    return (
         <div className="">
             <TopBar session={session} />
 
-            <header className="h-screen flex items-center flex-col justify-center text-center bg-gradient-to-b from-blue-100 to-white">
+            <header className="flex h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-100 to-white text-center">
                 <h1 className="mb-4 text-5xl font-bold">
                     Welcome to the GP Appointment System
                 </h1>
@@ -164,7 +164,7 @@ const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
                     ))}
                 </div>
             </section>
-       </div>
+        </div>
     );
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
-import { Sidebar } from "~/app/_components/ui/sidebar";
 import { getServerAuthSession } from "~/server/auth";
+import { TopBar } from "../_components/ui/topbar";
 
 export default async function RootLayout({
     children,
@@ -9,8 +9,8 @@ export default async function RootLayout({
 }) {
     return (
         <div>
-            <Sidebar session={await getServerAuthSession()} />
-            <main className="ml-64">{children}</main>
+            <TopBar session={await getServerAuthSession()} />
+            <main className="pt-20">{children}</main>
         </div>
     );
 }
