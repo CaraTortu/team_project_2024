@@ -8,10 +8,8 @@ import {
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
-import DiscordProvider from "next-auth/providers/discord";
 import { z } from "zod";
 
-import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable, users } from "~/server/db/schema";
 import bcrypt from "bcrypt";
@@ -70,11 +68,6 @@ export const authOptions: NextAuthOptions = {
     },
     adapter: DrizzleAdapter(db, createTable) as Adapter,
     providers: [
-        DiscordProvider({
-            id: "discord",
-            clientId: env.DISCORD_CLIENT_ID,
-            clientSecret: env.DISCORD_CLIENT_SECRET,
-        }),
         Credentials({
             id: "credentials",
             name: "Username and Password",
