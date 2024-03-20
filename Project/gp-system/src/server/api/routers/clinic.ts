@@ -9,7 +9,7 @@ export const clinicRouter = createTRPCRouter({
                 name: clinic.name,
                 address: clinic.address,
                 lat: clinic.latitude,
-                long: clinic.longitude
+                long: clinic.longitude,
             })
             .from(clinic);
     }),

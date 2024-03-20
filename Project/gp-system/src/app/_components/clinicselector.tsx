@@ -18,25 +18,35 @@ const ClinicSelector: React.FC<{
     setClinic: React.Dispatch<React.SetStateAction<ClinicFormat | null>>;
 }> = ({ setClinic }) => {
     const clinics = api.clinic.getClinics.useQuery();
-    
+
     return (
         <>
             {clinics.isLoading && <p>Loading...</p>}
             {clinics.isSuccess && (
                 <MapContainer
-                    center={[Number(clinics.data[0]?.lat), Number(clinics.data[0]?.long)]}
+                    center={[
+                        Number(clinics.data[0]?.lat),
+                        Number(clinics.data[0]?.long),
+                    ]}
                     zoom={13}
                     scrollWheelZoom={false}
                     className="relative h-[88vh] w-full"
                 >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    {clinics.data.map(clinic => (
-                        <Marker position={[Number(clinic.lat), Number(clinic.long)]} >
-                           <Popup className="flex flex-col">
+                    {clinics.data.map((clinic) => (
+                        <Marker
+                            position={[Number(clinic.lat), Number(clinic.long)]}
+                        >
+                            <Popup className="flex flex-col">
                                 <p>Name: {clinic.name}</p>
                                 <p>Address: {clinic.address}</p>
-                                <button onClick={() => setClinic(clinic)} className="bg-blue-400 text-white font-bold px-2 py-1 rounded-lg hover:bg-blue-500 duration-300">Select this clinic</button>
-                           </Popup> 
+                                <button
+                                    onClick={() => setClinic(clinic)}
+                                    className="rounded-lg bg-blue-400 px-2 py-1 font-bold text-white duration-300 hover:bg-blue-500"
+                                >
+                                    Select this clinic
+                                </button>
+                            </Popup>
                         </Marker>
                     ))}
                 </MapContainer>
@@ -45,5 +55,4 @@ const ClinicSelector: React.FC<{
     );
 };
 
-export default ClinicSelector
-
+export default ClinicSelector;

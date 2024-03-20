@@ -26,13 +26,13 @@ export default function GetAppointmentPage() {
         <div className="flex w-full">
             <div className="grid flex-grow grid-cols-3 gap-2 px-4">
                 {upcomingAppointments.isLoading && (
-                    <p className="mt-12 col-end-3 text-center text-2xl font-semibold text-gray-600">
+                    <p className="col-end-3 mt-12 text-center text-2xl font-semibold text-gray-600">
                         Loading appointments...
                     </p>
                 )}
                 {upcomingAppointments.isSuccess &&
                     upcomingAppointments.data.length == 0 && (
-                        <p className="mt-12 col-end-3 text-center text-2xl font-semibold text-gray-600">
+                        <p className="col-end-3 mt-12 text-center text-2xl font-semibold text-gray-600">
                             You have no upcoming appointments
                         </p>
                     )}

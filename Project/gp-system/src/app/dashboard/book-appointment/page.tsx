@@ -15,7 +15,8 @@ interface ClinicFormat {
 
 const BookAppointment: React.FC<{
     clinicSelected: ClinicFormat;
-}> = ({ clinicSelected }) => {
+    setClinic: React.Dispatch<React.SetStateAction<ClinicFormat | null>>;
+}> = ({ clinicSelected, setClinic }) => {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
     let availableAppointments =
@@ -139,6 +140,11 @@ const BookAppointment: React.FC<{
                 </button>
             </div>
             <div className="flex justify-center gap-6 duration-300">
+                
+                {availableAppointments?.data?.length && (<div className="flex items-center"> 
+                    <button onClick={() => setClinic(null)} className="bg-white text-blue-400 hover:bg-blue-500 hover:text-white border-2 border-blue-400 duration-300 px-2 py-1 rounded-lg">{"<- "}Select another clinic</button>
+                </div>)}
+
                 {availableAppointments?.data?.length == 0 && (
                     <p className="mt-24 w-full text-center text-3xl">
                         No appointments available for this day!
@@ -174,7 +180,7 @@ const BookAppointment: React.FC<{
                             return (
                                 <button
                                     key={slot.time.getTime().toString()}
-                                    className={`flex gap-2 rounded-lg border p-2 text-left duration-300 ${slotClassName}`}
+                                    className={`flex gap-2 rounded-lg border p-2 text-left text-sm duration-300 ${slotClassName}`}
                                     onClick={() =>
                                         setSelectedSlotId({
                                             time: slot.time,
@@ -259,7 +265,7 @@ export default function BookPage() {
                     <ClinicSelector setClinic={setClinic} />
                 </Suspense>
             )}
-            {clinic && <BookAppointment clinicSelected={clinic} />}
+            {clinic && <BookAppointment clinicSelected={clinic} setClinic={setClinic} />}
         </>
     );
 }
