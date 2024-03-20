@@ -6,7 +6,10 @@ export const clinicRouter = createTRPCRouter({
         return await ctx.db
             .select({
                 id: clinic.id,
+                name: clinic.name,
                 address: clinic.address,
+                lat: clinic.latitude,
+                long: clinic.longitude
             })
             .from(clinic);
     }),

@@ -36,7 +36,6 @@ cd ../gp-system
 
 if ! [ -x ".env" ]; then
     echo "[-] ERROR: Please create the .env file in ../gp-system from the template .env.example"
-    exit 1
 fi
 
 source .env

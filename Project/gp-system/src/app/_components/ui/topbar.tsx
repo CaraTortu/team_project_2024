@@ -34,7 +34,7 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                             Book an appointment
                         </Link>
                         <Link
-                            href="/dashboard/biling"
+                            href="/dashboard/billing"
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
                         >
                             Billing
@@ -65,8 +65,8 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                     </Link>
                 )}
                 {session?.user && (
-                    <div className="mr-4 font-sans text-black">
-                        Welcome{" "}
+                    <div className="mr-4 flex items-center gap-2 font-sans text-black">
+                        Welcome
                         <span className="text-lg font-bold">
                             {session.user.name}
                         </span>

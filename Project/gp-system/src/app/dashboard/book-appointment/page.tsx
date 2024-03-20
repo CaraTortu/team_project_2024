@@ -1,18 +1,27 @@
 "use client";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { format, addDays, isBefore, isToday } from "date-fns";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
+import dynamic from "next/dynamic";
 
-export default function BookAppointmentPage() {
-    const clinic_selected = 3;
+const ClinicSelector = dynamic(() => import('~/app/_components/clinicselector'), { ssr: false })
 
+interface ClinicFormat {
+    id: number;
+    name: string;
+    address: string;
+}
+
+const BookAppointment: React.FC<{
+    clinicSelected: ClinicFormat;
+}> = ({ clinicSelected }) => {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
     let availableAppointments =
         api.appointment.getAvailableAppointments.useQuery({
             day: selectedDate,
-            clinic_id: clinic_selected,
+            clinic_id: clinicSelected.id,
         }).data;
 
     const weekDays: Date[] = [];
@@ -51,14 +60,14 @@ export default function BookAppointmentPage() {
         if (!selectedSlotId || !selectedDate || !availableAppointments) return;
 
         if (!visitReason) {
-            toast.error("You need to supply a reason for your visit")
+            toast.error("You need to supply a reason for your visit");
             return;
         }
 
         const res = await make_booking.mutateAsync({
             doctorId: selectedSlotId.doctor_id,
             appointmentDate: selectedSlotId.time,
-            details: visitReason
+            details: visitReason,
         });
 
         if (!res.success && res.reason) {
@@ -190,8 +199,30 @@ export default function BookAppointmentPage() {
                             Appointment information
                         </p>
                         <div className="text-md font-semibold text-gray-600">
-                            <p>Doctor: {selectedSlotId.doctor_name}</p>
-                            <p>Date: {selectedSlotId.time.toUTCString()}</p>
+                            <p>
+                                <span className="font-bold text-gray-700">
+                                    Clinic name
+                                </span>
+                                : {clinicSelected.name}
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-700">
+                                    Clinic address
+                                </span>
+                                : {clinicSelected.address}
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-700">
+                                    Doctor
+                                </span>
+                                : {selectedSlotId.doctor_name}
+                            </p>
+                            <p>
+                                <span className="font-bold text-gray-700">
+                                    Date
+                                </span>
+                                : {selectedSlotId.time.toUTCString()}
+                            </p>
                         </div>
                         <div className="mt-12 flex flex-col gap-2">
                             <p className="font-semibold text-gray-800">
@@ -215,5 +246,20 @@ export default function BookAppointmentPage() {
                 )}
             </div>
         </div>
+    );
+};
+
+export default function BookPage() {
+    const [clinic, setClinic] = useState<ClinicFormat | null>(null);
+
+    return (
+        <>
+            {!clinic && (
+                <Suspense fallback={<></>}>
+                    <ClinicSelector setClinic={setClinic} />
+                </Suspense>
+            )}
+            {clinic && <BookAppointment clinicSelected={clinic} />}
+        </>
     );
 }

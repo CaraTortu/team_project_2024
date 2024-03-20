@@ -166,6 +166,9 @@ export const appointmentRelations = relations(appointment, ({ one }) => ({
 export const clinic = createTable("clinic", {
     id: serial("id").primaryKey(),
     address: varchar("address", { length: 1024 }).notNull(),
+    latitude: varchar("latitude", { length: 32 }),
+    longitude: varchar("longitude", { length: 32 }),
+    name: varchar("name").notNull(),
 });
 
 export const clinicRelations = relations(clinic, ({ many }) => ({

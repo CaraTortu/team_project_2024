@@ -24,45 +24,75 @@ export default function GetAppointmentPage() {
 
     return (
         <div className="flex w-full">
-            <div className="flex-grow px-4">
+            <div className="grid flex-grow grid-cols-3 gap-2 px-4">
                 {upcomingAppointments.isLoading && (
-                    <p className="mt-12 w-full text-2xl font-semibold text-gray-600 text-center">Loading appointments...</p>
+                    <p className="mt-12 col-end-3 text-center text-2xl font-semibold text-gray-600">
+                        Loading appointments...
+                    </p>
                 )}
-                {upcomingAppointments.isSuccess && upcomingAppointments.data.length == 0 && (
-                    <p className="mt-12 w-full text-2xl font-semibold text-gray-600 text-center">You have no upcoming appointments</p>
-                )}
+                {upcomingAppointments.isSuccess &&
+                    upcomingAppointments.data.length == 0 && (
+                        <p className="mt-12 col-end-3 text-center text-2xl font-semibold text-gray-600">
+                            You have no upcoming appointments
+                        </p>
+                    )}
                 {upcomingAppointments.isSuccess &&
                     upcomingAppointments.data!.map((appointment) => (
                         <div
                             key={appointment.id}
-                            className="mb-4 rounded-lg p-4 shadow-xl bg-slate-100"
+                            className="mb-4 flex justify-between gap-2 rounded-lg bg-slate-200 p-4 shadow-xl"
                         >
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between break-words">
                                 <div>
-                                    <h2 className="text-lg font-bold">
-                                        {appointment.title}
-                                    </h2>
-                                    <p className="text-xl font-bold text-gray-600">
+                                    <p className="text-xl font-bold text-black">
                                         {appointment.doctorName}
                                     </p>
-                                    <p className="text-gray-600">
+                                    <p className="font-bold text-gray-600">
                                         {appointment.appointmentDate.toLocaleString()}
                                     </p>
-                                    <button
-                                        onClick={() =>
-                                            cancelAppointment(
-                                                appointment.appointmentDate,
-                                            )
-                                        }
-                                        className="mt-2 text-blue-500 hover:text-blue-600"
-                                    >
-                                        Cancel appointment
-                                    </button>
+                                    <p className="mt-2 text-gray-600">
+                                        <span className="font-bold text-gray-800">
+                                            Payment
+                                        </span>
+                                        : {appointment.paymentAmount}€
+                                    </p>
+                                    <p className="text-gray-600">
+                                        <span className="font-bold text-gray-800">
+                                            Payment status
+                                        </span>
+                                        : {appointment.paymentStatus}
+                                    </p>
+                                    <p className="text-gray-600">
+                                        <span className="font-bold text-gray-800">
+                                            Reason for appointment
+                                        </span>
+                                        : {appointment.details}
+                                    </p>
                                 </div>
                             </div>
-                            {/* Details section */}
-                            <div className="mt-2 text-gray-600">
-                                <p>Details: {appointment.details}</p>
+                            <div className="flex min-w-32 flex-col items-center justify-center space-y-2">
+                                <button
+                                    onClick={() =>
+                                        cancelAppointment(
+                                            appointment.appointmentDate,
+                                        )
+                                    }
+                                    className="mt-2 w-full rounded-lg bg-blue-400 px-4 py-1 text-white duration-300 hover:bg-blue-500 hover:shadow-xl"
+                                >
+                                    Cancel
+                                </button>
+                                {appointment.paymentStatus != "complete" && (
+                                    <button
+                                        onClick={() =>
+                                            toast.success(
+                                                "Redirecting you to payment...",
+                                            )
+                                        }
+                                        className="mt-2 w-full rounded-lg bg-blue-400 px-4 py-1 text-white duration-300 hover:bg-blue-500 hover:shadow-xl"
+                                    >
+                                        Pay now
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}

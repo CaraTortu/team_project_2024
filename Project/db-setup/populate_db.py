@@ -92,11 +92,14 @@ def create_clinic():
     clinic_address = str(random.randint(1,100))
     clinic_address += " Avenue St. "
     clinic_address += random.choice(["lorem", "ipsum", "dolor", "sit", "amet", "eunans", "hello"])
-    
+    name = random.choice(["Ballyrain", "LkGP", "loremIp", "ClinicForAll"])
+    lat = str(54.953729 + (random.random()-0.5)/5)
+    long = str(-7.708638 + (random.random()-0.5)/5)
+
     with conn.cursor() as cursor:
         cursor.execute("""
-        INSERT INTO public."gp-system_clinic" (address) VALUES(%s);
-                       """, (clinic_address,))
+        INSERT INTO public."gp-system_clinic" (address, name, latitude, longitude) VALUES(%s, %s, %s, %s);
+                       """, (clinic_address, name, lat, long))
 
 CLINICS = 30
 DOCTORS = 100
