@@ -34,7 +34,7 @@ fi
 set -a
 cd ../gp-system
 
-if ! [ -x ".env" ]; then
+if ! [ -e ".env" ]; then
     echo "[-] ERROR: Please create the .env file in ../gp-system from the template .env.example"
 fi
 
@@ -56,11 +56,11 @@ cd ../db-setup
 if [[ $NODE_ENV == "development" ]]; then
     echo "[i] Environment is set to development. Populating database..."
 
-    if [ -x "$(command -v apt)" ]; then 
+    if [ "$(command -v apt)" ]; then 
         apt install python3-dev -y
     fi
 
-    if ! [ -d ".venv" ]; then
+    if [ ! -e ".venv" ]; then
         python3 -m venv .venv
         source .venv/bin/activate
         python3 -m pip install -r requirements.txt

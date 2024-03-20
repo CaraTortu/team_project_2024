@@ -6,7 +6,7 @@ set -a
 echo "[i] Creating DB"
 cd ../gp-system
 
-if [ ! -x ".env" ]; then
+if [ ! -e ".env" ]; then
     cp .env.example .env
 fi
 
