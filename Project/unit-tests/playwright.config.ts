@@ -51,6 +51,7 @@ export default defineConfig({
       command: process.platform == "linux" ? 'bash ./start_dev_webserver.sh' : 'powershell -File start_dev_webserver.ps1',
       url: 'http://127.0.0.1:3000',
       reuseExistingServer: !process.env.CI,
-      stdout: "pipe"
+      stdout: "pipe",
+      timeout: 180 * 1000
   },
 });
