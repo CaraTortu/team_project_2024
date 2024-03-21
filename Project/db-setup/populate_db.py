@@ -23,6 +23,42 @@ conn = psycopg2.connect(
     database=url.path[1:]
 )
 
+def create_initial_users_for_testing():
+    # Create doctor
+    doctor_id = random_id()
+    full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
+    email = f"doctor@example.com"
+    email_verified = datetime.fromtimestamp(random.randint(1000000, 1000000000)) 
+    password = bcrypt.hashpw("password".encode(), bcrypt.gensalt()).decode()
+    image = f"{full_name.lower().replace(' ', '_')}.jpg"
+    title = "Dr"
+    first_name, last_name = full_name.split()
+
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType", "clinicId")
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """, (doctor_id, title, first_name, last_name, full_name, email, email_verified, password, image, "doctor", 1))
+
+    user_id = random_id()
+    full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
+    email = f"user@example.com"
+    password = bcrypt.hashpw("password".encode(), bcrypt.gensalt()).decode()
+    image = f"{full_name.lower().replace(' ', '_')}.jpg"
+    email_verified = datetime.fromtimestamp(random.randint(1583064000, 1709838848)) 
+
+
+    title = random.choice(["Mr", "Ms"])
+    first_name, last_name = full_name.split()
+
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType")
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """, (user_id, title, first_name, last_name, full_name, email, email_verified, password, image, "user"))
+
+
+
 def random_string(len: int):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(len))
@@ -107,6 +143,7 @@ PATIENTS = 250
 APPOINTMENTS = 50
 [create_clinic() for _ in range(CLINICS)]
 
+create_initial_users_for_testing()
 doctor_ids = [create_doctor(random.randint(1, CLINICS)) for _ in range(DOCTORS)]
 user_ids = [create_user() for _ in range(PATIENTS)]
 
