@@ -13,6 +13,41 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                 className="ml-4 h-12 w-12 rounded-full shadow-lg"
             ></img>
             <div className="ml-8 flex h-full items-center font-bold text-white">
+                {session && session.user?.userType == "doctor" && (
+                    <div className="text-md flex gap-x-8 text-blue-400 text-opacity-80">
+                        <Link
+                            href="/dashboard/my-info"
+                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
+                        >
+                            My account
+                        </Link>
+                        <Link
+                            href="/dashboard/schedule"
+                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
+                        >
+                            Schedule
+                        </Link>
+                        <Link
+                            href="/dashboard/patient-records"
+                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
+                        >
+                            Patient records
+                        </Link>
+                        <Link
+                            href="/dashboard/support"
+                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
+                        >
+                            Help and support
+                        </Link>
+                        <button
+                            onClick={() => signOut()}
+                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
+                        >
+                            Sign out
+                        </button>
+                    </div>
+                )}
+           
                 {session && session.user?.userType == "user" && (
                     <div className="text-md flex gap-x-8 text-blue-400 text-opacity-80">
                         <Link
