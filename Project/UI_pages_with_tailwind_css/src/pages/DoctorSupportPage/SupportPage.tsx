@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/Sidebar/Sidebar';
+import DoctorSidebar from '../../components/DoctorSidebar/DoctorSidebar';
 
 const faqs = [
   {
@@ -66,7 +66,7 @@ const SupportPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar />
+      <DoctorSidebar />
       <div className="flex-1 p-10 pl-64 overflow-y-auto">
         <div className="container mx-auto bg-white shadow rounded p-6">
           <h1 className="text-xl font-bold text-gray-900 mb-6">Help/Support</h1>

@@ -20,7 +20,6 @@ const DoctorMyInfoPage = () => {
       email: 'Email notifications',
       push: 'Push notifications',
     },
-    // Add other necessary info fields...
   };
 
   return (
@@ -71,22 +70,54 @@ const DoctorMyInfoPage = () => {
             {/* Contact Information */}
             <section className="mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Contact Information</h2>
-              {/* Similar structure for Contact Information fields... */}
+              <section className="mb-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Mailing address</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.mailingAddress}</div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Phone number</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.phone}</div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Fax</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.fax}</div>
+              </div>
+            </section>
             </section>
 
             {/* Job Information */}
             <section className="mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Job Information</h2>
-              {/* Similar structure for Job Information fields... */}
+              <section className="mb-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Department</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.department}</div>
+              </div>
+            </section>
             </section>
 
             {/* System Settings */}
             <section className="mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">System Settings</h2>
-              {/* Similar structure for System Settings fields... */}
+              <section className="mb-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Language</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.language}</div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Privacy settings</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.privacySettings}</div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Notification settings</label>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.notificationSettings.stream}</div>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.notificationSettings.email}</div>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{doctorInfo.notificationSettings.push}</div>
+              </div>
+              
             </section>
-
-            {/* Repeat structure for other sections */}
+            </section>
           </div>
         </div>
       </div>

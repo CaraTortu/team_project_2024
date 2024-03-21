@@ -11,6 +11,8 @@ import DoctorMyInfoPage from './pages/DoctorMyInfoPage/DoctorMyInfoPage';
 import SupportPage from './pages/SupportPage/SupportPage';
 import DoctorPatientInfo from './pages/DoctorPatientInfo/DoctorPatientInfo';
 import BillingPage from './pages/BillingPage/BillingPage';
+import MyInfoPage from './pages/MyInfoPage/MyInfoPage';
+import DoctorSupportPage from './pages/DoctorSupportPage/SupportPage';
 
 const App: React.FC = () => {
   return (
@@ -27,6 +29,8 @@ const App: React.FC = () => {
           <Route path="/help" element={<SupportPage />} />
           <Route path="/patient-info" element={<DoctorPatientInfo />} />
           <Route path="/billing" element={<BillingPage />} />
+          <Route path="/my-info" element={<MyInfoPage />} />
+          <Route path="/doctor-support" element={<DoctorSupportPage />} />
           {/* Add more routes here */}
         </Routes>
       </div>
