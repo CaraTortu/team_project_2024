@@ -23,4 +23,5 @@ Set-Location ..\db-setup
 # Set up webserver
 Set-Location ..\gp-system
 npm.cmd install
-npm.cmd run dev
+npm.cmd run build
+npm.cmd run start
