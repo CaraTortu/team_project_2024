@@ -19,5 +19,6 @@ echo "[+] Created DB"
 echo "[i] Setting up web server"
 cd ../gp-system
 npm i
-npm run dev 
+npm run build
+npm run start
 
