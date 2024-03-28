@@ -1,14 +1,14 @@
 {
-  "name": "unit_tests",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@playwright/test": "^1.42.1",
-    "@types/node": "^20.11.25"
-  }
+    "name": "unit_tests",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {},
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@playwright/test": "^1.42.1",
+        "@types/node": "^20.11.25"
+    }
 }

@@ -1,7 +1,15 @@
-export default function InfoPage() {
+import { DoctorMyInfoPage } from "~/app/_components/myinfo";
+import { getServerAuthSession } from "~/server/auth";
+
+const Doctor = async () => {
+    const session = await getServerAuthSession();
+
     return (
         <>
-            <h1>My info</h1>
+        <DoctorMyInfoPage session={session!} />
         </>
-    );
-}
+    )
+};
+
+export default Doctor;
+
