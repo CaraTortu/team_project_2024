@@ -47,7 +47,7 @@ export default function SignupPage() {
 
         toast.success("Success! Redirecting you...");
         await new Promise((resolve) => setTimeout(resolve, 200));
-        router.push("/dashboard/upcoming");
+        router.push("/dashboard");
     };
 
     return (

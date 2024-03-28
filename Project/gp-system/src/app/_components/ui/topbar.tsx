@@ -47,7 +47,7 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                         </button>
                     </div>
                 )}
-           
+
                 {session && session.user?.userType == "user" && (
                     <div className="text-md flex gap-x-8 text-blue-400 text-opacity-80">
                         <Link
@@ -60,7 +60,7 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                             href="/dashboard/upcoming"
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
                         >
-                            Upcoming appointments
+                            My appointments
                         </Link>
                         <Link
                             href="/dashboard/book-appointment"

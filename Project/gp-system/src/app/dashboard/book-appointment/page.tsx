@@ -5,7 +5,10 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
 
-const ClinicSelector = dynamic(() => import('~/app/_components/clinicselector'), { ssr: false })
+const ClinicSelector = dynamic(
+    () => import("~/app/_components/clinicselector"),
+    { ssr: false },
+);
 
 interface ClinicFormat {
     id: number;
@@ -140,10 +143,16 @@ const BookAppointment: React.FC<{
                 </button>
             </div>
             <div className="flex justify-center gap-6 duration-300">
-                
-                {availableAppointments?.data?.length && (<div className="flex items-center"> 
-                    <button onClick={() => setClinic(null)} className="bg-white text-blue-400 hover:bg-blue-500 hover:text-white border-2 border-blue-400 duration-300 px-2 py-1 rounded-lg">{"<- "}Select another clinic</button>
-                </div>)}
+                {availableAppointments?.data?.length && (
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => setClinic(null)}
+                            className="rounded-lg border-2 border-blue-400 bg-white px-2 py-1 text-blue-400 duration-300 hover:bg-blue-500 hover:text-white"
+                        >
+                            {"<- "}Select another clinic
+                        </button>
+                    </div>
+                )}
 
                 {availableAppointments?.data?.length == 0 && (
                     <p className="mt-24 w-full text-center text-3xl">
@@ -265,7 +274,12 @@ export default function BookPage() {
                     <ClinicSelector setClinic={setClinic} />
                 </Suspense>
             )}
-            {clinic && <BookAppointment clinicSelected={clinic} setClinic={setClinic} />}
+            {clinic && (
+                <BookAppointment
+                    clinicSelected={clinic}
+                    setClinic={setClinic}
+                />
+            )}
         </>
     );
 }

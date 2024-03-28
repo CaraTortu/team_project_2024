@@ -1,37 +1,86 @@
 import { z } from "zod";
 
 import { eq, and, gt, lt, inArray } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+    createTRPCRouter,
+    protectedProcedure,
+    staffProtectedProcedure,
+} from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { appointment, users } from "~/server/db/schema";
 
 export const appointmentRouter = createTRPCRouter({
-    getAppointments: protectedProcedure.query(async ({ ctx: { session } }) => {
-        return await db
-            .select({
-                id: appointment.id,
-                appointmentDate: appointment.appointmentDate,
-                paymentAmount: appointment.paymentAmount,
-                paymentStatus: appointment.paymentStatus,
-                title: appointment.title,
-                details: appointment.details,
-                doctorName: users.name,
-            })
-            .from(appointment)
-            .where(
-                and(
-                    eq(appointment.userId, session.user.id),
-                    eq(appointment.isCancelled, false),
-                ),
-            )
-            .leftJoin(users, eq(users.id, appointment.doctorId))
-            .execute()
-            .then((res) =>
-                res.sort((a, b) =>
-                    a.appointmentDate < b.appointmentDate ? -1 : 1,
-                ),
+    getAppointments: protectedProcedure
+        .input(z.object({ pastOrFuture: z.string() }))
+        .query(async ({ ctx: { session }, input }) => {
+            return await db
+                .select({
+                    id: appointment.id,
+                    appointmentDate: appointment.appointmentDate,
+                    paymentAmount: appointment.paymentAmount,
+                    paymentStatus: appointment.paymentStatus,
+                    title: appointment.title,
+                    details: appointment.details,
+                    doctorName: users.name,
+                })
+                .from(appointment)
+                .where(
+                    and(
+                        eq(appointment.userId, session.user.id),
+                        eq(appointment.isCancelled, false),
+                        input.pastOrFuture == "future"
+                            ? gt(appointment.appointmentDate, new Date())
+                            : lt(appointment.appointmentDate, new Date()),
+                    ),
+                )
+                .leftJoin(users, eq(users.id, appointment.doctorId))
+                .execute()
+                .then((res) =>
+                    res.sort((a, b) =>
+                        a.appointmentDate < b.appointmentDate ? -1 : 1,
+                    ),
+                );
+        }),
+    getDoctorAppointments: staffProtectedProcedure
+        .input(z.object({ day: z.date() }))
+        .query(async ({ ctx: { session }, input }) => {
+            const startDate = new Date(
+                input.day.getFullYear(),
+                input.day.getMonth(),
+                input.day.getDate(),
             );
-    }),
+            const endDate = new Date(
+                input.day.getFullYear(),
+                input.day.getMonth(),
+                input.day.getDate() + 1,
+            );
+
+            return await db
+                .select({
+                    id: appointment.id,
+                    appointmentDate: appointment.appointmentDate,
+                    title: appointment.title,
+                    details: appointment.details,
+                    patientName: users.name,
+                    patientId: users.id,
+                })
+                .from(appointment)
+                .where(
+                    and(
+                        eq(appointment.doctorId, session.user.id),
+                        eq(appointment.isCancelled, false),
+                        lt(appointment.appointmentDate, endDate),
+                        gt(appointment.appointmentDate, startDate),
+                    ),
+                )
+                .leftJoin(users, eq(users.id, appointment.userId))
+                .execute()
+                .then((res) =>
+                    res.sort((a, b) =>
+                        a.appointmentDate < b.appointmentDate ? -1 : 1,
+                    ),
+                );
+        }),
     getAvailableAppointments: protectedProcedure
         .input(z.object({ day: z.date(), clinic_id: z.number().min(0) }))
         .query(async ({ input }) => {
@@ -72,14 +121,10 @@ export const appointmentRouter = createTRPCRouter({
 
             const appointmentsBooked = await db.query.appointment.findMany({
                 where: and(
-                    and(
-                        and(
-                            inArray(appointment.doctorId, doctor_ids),
-                            gt(appointment.appointmentDate, startDate),
-                        ),
-                        lt(appointment.appointmentDate, endDate),
-                        eq(appointment.isCancelled, false),
-                    ),
+                    inArray(appointment.doctorId, doctor_ids),
+                    gt(appointment.appointmentDate, startDate),
+                    lt(appointment.appointmentDate, endDate),
+                    eq(appointment.isCancelled, false),
                 ),
                 with: {
                     doctor: {
@@ -120,11 +165,13 @@ export const appointmentRouter = createTRPCRouter({
                     doctor_name: doctor.name,
                     available_appointments: availableAppointments.map(
                         (appointment) => ({
-                            free: !appointment_booked_doctor
-                                .map((a) =>
-                                    a.appointmentDate.getTime().toString(),
-                                )
-                                .includes(appointment.getTime().toString()),
+                            free:
+                                appointment.getTime() > new Date().getTime() &&
+                                !appointment_booked_doctor
+                                    .map((a) =>
+                                        a.appointmentDate.getTime().toString(),
+                                    )
+                                    .includes(appointment.getTime().toString()),
                             time: appointment,
                         }),
                     ),
@@ -147,6 +194,13 @@ export const appointmentRouter = createTRPCRouter({
                 return {
                     success: false,
                     reason: "You cannot book an appointment on saturday or sunday",
+                };
+            }
+
+            if (input.appointmentDate.getTime() < new Date().getTime()) {
+                return {
+                    success: false,
+                    reason: "You cannot book appointments in the past",
                 };
             }
 
@@ -207,11 +261,10 @@ export const appointmentRouter = createTRPCRouter({
                 .set({ isCancelled: true })
                 .where(
                     and(
-                        and(
-                            eq(appointment.appointmentDate, input.appointDate),
-                            eq(appointment.userId, ctx.session.user.id),
-                        ),
+                        eq(appointment.appointmentDate, input.appointDate),
+                        eq(appointment.userId, ctx.session.user.id),
                         eq(appointment.isCancelled, false),
+                        gt(appointment.appointmentDate, new Date()),
                     ),
                 )
                 .returning();

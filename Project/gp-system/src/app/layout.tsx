@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`font-sans ${roboto.variable}`}>
+            <body className={`select-none font-sans ${roboto.variable}`}>
                 <TRPCReactProvider>
                     <Toaster position="top-center" />
                     {children}

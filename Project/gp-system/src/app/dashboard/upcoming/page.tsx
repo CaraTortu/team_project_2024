@@ -1,10 +1,13 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 
 export default function GetAppointmentPage() {
-    let upcomingAppointments = api.appointment.getAppointments.useQuery();
+    const [pastOrFuture, setPastOrFuture] = useState("future");
+    let upcomingAppointments = api.appointment.getAppointments.useQuery({
+        pastOrFuture,
+    });
     const cancel_appointment = api.appointment.cancelAppointment.useMutation();
 
     const cancelAppointment = async (appointmentDate: Date) => {
@@ -23,7 +26,18 @@ export default function GetAppointmentPage() {
     };
 
     return (
-        <div className="flex w-full">
+        <div className="w-full flex-col">
+            <div className="flex items-center gap-2 px-4 pb-4 text-xl font-bold">
+                <select
+                    value={pastOrFuture}
+                    onChange={(e) => setPastOrFuture(e.target.value)}
+                    className="rounded-lg border-2 border-blue-400 bg-slate-100 px-2 py-1 relative text-center duration-300 focus:outline-none focus:ring-0"
+                >
+                    <option value="future">Upcoming</option>
+                    <option value="past">Previous</option>
+                </select>
+                <p>appointments</p>
+            </div>
             <div className="grid flex-grow grid-cols-3 gap-2 px-4">
                 {upcomingAppointments.isLoading && (
                     <p className="col-end-3 mt-12 text-center text-2xl font-semibold text-gray-600">
@@ -33,7 +47,7 @@ export default function GetAppointmentPage() {
                 {upcomingAppointments.isSuccess &&
                     upcomingAppointments.data.length == 0 && (
                         <p className="col-end-3 mt-12 text-center text-2xl font-semibold text-gray-600">
-                            You have no upcoming appointments
+                            You have no { pastOrFuture == "future" ? "upcoming" : "past" } appointments
                         </p>
                     )}
                 {upcomingAppointments.isSuccess &&
@@ -71,7 +85,7 @@ export default function GetAppointmentPage() {
                                 </div>
                             </div>
                             <div className="flex min-w-32 flex-col items-center justify-center space-y-2">
-                                <button
+                                {pastOrFuture == "future" && (<button
                                     onClick={() =>
                                         cancelAppointment(
                                             appointment.appointmentDate,
@@ -80,7 +94,7 @@ export default function GetAppointmentPage() {
                                     className="mt-2 w-full rounded-lg bg-blue-400 px-4 py-1 text-white duration-300 hover:bg-blue-500 hover:shadow-xl"
                                 >
                                     Cancel
-                                </button>
+                                </button>)}
                                 {appointment.paymentStatus != "complete" && (
                                     <button
                                         onClick={() =>
