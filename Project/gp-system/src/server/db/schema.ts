@@ -123,7 +123,6 @@ export const appointment = createTable(
     "appointment",
     {
         id: serial("id").primaryKey(),
-        title: varchar("title", { length: 255 }),
         userId: varchar("userId", { length: 255 })
             .references(() => users.id)
             .notNull(),
@@ -136,13 +135,15 @@ export const appointment = createTable(
         appointmentDate: timestamp("appointmentDate", {
             mode: "date",
         }).notNull(),
-        details: varchar("details", { length: 2048 }),
+        details: varchar("details", { length: 512 }),
         paymentAmount: real("paymentAmount"),
         paymentStatus: paymentStatus("paymentStatus").default("pending"),
         isCancelled: boolean("isCancelled").default(false),
         createdAt: timestamp("created_at")
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
+        diagnoses: varchar("diagnoses", { length: 2048 }),
+        notes: varchar("doctorNotes", { length: 16384 })
     },
     (appointment) => ({
         userIdIdx: index("appointment_userId_idx").on(appointment.userId),

@@ -116,13 +116,12 @@ def create_appointments(doctor_ids, user_ids):
     doctor_id = random.choice(doctor_ids)
     user_id = random.choice(user_ids)
     created_by = random.choice([doctor_id, user_id])
-    title = random.choice(["X-Ray", "Blood test", "Follow up", "Prescription update"])
 
     with conn.cursor() as cursor:
         cursor.execute("""
-            INSERT INTO public."gp-system_appointment" ("title", "details", "doctorId", "userId", "appointmentDate", "createdById")
-            VALUES (%s, 'No details', %s, %s, %s, %s);
-        """, (title, doctor_id, user_id, appointment_date, created_by))
+            INSERT INTO public."gp-system_appointment" ("details", "doctorId", "userId", "appointmentDate", "createdById", "paymentAmount")
+            VALUES ('No details', %s, %s, %s, %s, 60);
+        """, (doctor_id, user_id, appointment_date, created_by))
 
 def create_clinic():
     clinic_address = str(random.randint(1,100))
@@ -147,8 +146,7 @@ create_initial_users_for_testing()
 doctor_ids = [create_doctor(random.randint(1, CLINICS)) for _ in range(DOCTORS)]
 user_ids = [create_user() for _ in range(PATIENTS)]
 
-for _ in range(APPOINTMENTS):
-    create_appointments(doctor_ids, user_ids)
+[create_appointments(doctor_ids, user_ids) for _ in range(APPOINTMENTS)]
 
 print("Random data successfully inserted into the database.")
 
