@@ -31,7 +31,7 @@ export default function GetAppointmentPage() {
                 <select
                     value={pastOrFuture}
                     onChange={(e) => setPastOrFuture(e.target.value)}
-                    className="rounded-lg border-2 border-blue-400 bg-slate-100 px-2 py-1 relative text-center duration-300 focus:outline-none focus:ring-0"
+                    className="relative rounded-lg border-2 border-blue-400 bg-slate-100 px-2 py-1 text-center duration-300 focus:outline-none focus:ring-0"
                 >
                     <option value="future">Upcoming</option>
                     <option value="past">Previous</option>
@@ -47,7 +47,9 @@ export default function GetAppointmentPage() {
                 {upcomingAppointments.isSuccess &&
                     upcomingAppointments.data.length == 0 && (
                         <p className="col-end-3 mt-12 text-center text-2xl font-semibold text-gray-600">
-                            You have no { pastOrFuture == "future" ? "upcoming" : "past" } appointments
+                            You have no{" "}
+                            {pastOrFuture == "future" ? "upcoming" : "past"}{" "}
+                            appointments
                         </p>
                     )}
                 {upcomingAppointments.isSuccess &&
@@ -82,19 +84,33 @@ export default function GetAppointmentPage() {
                                         </span>
                                         : {appointment.details}
                                     </p>
+                                    {pastOrFuture == "past" && (<p className="text-gray-600">
+                                        <span className="font-bold text-gray-800">
+                                            Notes
+                                        </span>
+                                        : {appointment.notes}
+                                    </p>)}
+                                    {pastOrFuture == "past" && (<p className="text-gray-600">
+                                        <span className="font-bold text-gray-800">
+                                            Diagnoses
+                                        </span>
+                                        : {appointment.diagnoses}
+                                    </p>)}
                                 </div>
                             </div>
                             <div className="flex min-w-32 flex-col items-center justify-center space-y-2">
-                                {pastOrFuture == "future" && (<button
-                                    onClick={() =>
-                                        cancelAppointment(
-                                            appointment.appointmentDate,
-                                        )
-                                    }
-                                    className="mt-2 w-full rounded-lg bg-blue-400 px-4 py-1 text-white duration-300 hover:bg-blue-500 hover:shadow-xl"
-                                >
-                                    Cancel
-                                </button>)}
+                                {pastOrFuture == "future" && (
+                                    <button
+                                        onClick={() =>
+                                            cancelAppointment(
+                                                appointment.appointmentDate,
+                                            )
+                                        }
+                                        className="mt-2 w-full rounded-lg bg-blue-400 px-4 py-1 text-white duration-300 hover:bg-blue-500 hover:shadow-xl"
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
                                 {appointment.paymentStatus != "complete" && (
                                     <button
                                         onClick={() =>

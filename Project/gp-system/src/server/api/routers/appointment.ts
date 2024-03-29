@@ -19,8 +19,9 @@ export const appointmentRouter = createTRPCRouter({
                     appointmentDate: appointment.appointmentDate,
                     paymentAmount: appointment.paymentAmount,
                     paymentStatus: appointment.paymentStatus,
-                    title: appointment.title,
                     details: appointment.details,
+                    notes: appointment.notes,
+                    diagnoses: appointment.diagnoses,
                     doctorName: users.name,
                 })
                 .from(appointment)
@@ -59,8 +60,9 @@ export const appointmentRouter = createTRPCRouter({
                 .select({
                     id: appointment.id,
                     appointmentDate: appointment.appointmentDate,
-                    title: appointment.title,
                     details: appointment.details,
+                    notes: appointment.notes,
+                    diagnoses: appointment.diagnoses,
                     patientName: users.name,
                     patientId: users.id,
                 })
@@ -277,5 +279,26 @@ export const appointmentRouter = createTRPCRouter({
             }
 
             return { success: true };
+        }),
+    updateNotes: staffProtectedProcedure
+        .input(
+            z.object({
+                day: z.date(),
+                userID: z.string(),
+                notes: z.string(),
+                diagnoses: z.string(),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+            await ctx.db
+                .update(appointment)
+                .set({ notes: input.notes, diagnoses: input.diagnoses })
+                .where(
+                    and(
+                        eq(appointment.userId, input.userID),
+                        eq(appointment.doctorId, ctx.session.user.id),
+                        eq(appointment.appointmentDate, input.day),
+                    ),
+                );
         }),
 });

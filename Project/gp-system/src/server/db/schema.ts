@@ -142,8 +142,8 @@ export const appointment = createTable(
         createdAt: timestamp("created_at")
             .default(sql`CURRENT_TIMESTAMP`)
             .notNull(),
-        diagnoses: varchar("diagnoses", { length: 2048 }),
-        notes: varchar("doctorNotes", { length: 16384 })
+        diagnoses: varchar("diagnoses", { length: 2048 }).default(""),
+        notes: varchar("doctorNotes", { length: 16384 }).default(""),
     },
     (appointment) => ({
         userIdIdx: index("appointment_userId_idx").on(appointment.userId),
