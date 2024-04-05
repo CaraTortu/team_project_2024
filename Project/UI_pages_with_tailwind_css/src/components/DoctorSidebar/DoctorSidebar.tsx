@@ -24,7 +24,7 @@ const DoctorSidebar: React.FC = () => {
                   <Link to="/patient-info" className="block py-2 px-4 hover:bg-blue-700">Patient Records</Link>
                 </li>       
                 <li>
-                  <Link to="/help" className="block py-2 px-4 hover:bg-blue-700">Help/Support</Link>
+                  <Link to="/doctor-support" className="block py-2 px-4 hover:bg-blue-700">Help/Support</Link>
                 </li>
               </ul>
             </nav>

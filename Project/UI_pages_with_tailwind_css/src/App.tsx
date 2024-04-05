@@ -13,6 +13,7 @@ import DoctorPatientInfo from './pages/DoctorPatientInfo/DoctorPatientInfo';
 import BillingPage from './pages/BillingPage/BillingPage';
 import MyInfoPage from './pages/MyInfoPage/MyInfoPage';
 import DoctorSupportPage from './pages/DoctorSupportPage/SupportPage';
+import AppointmentDetailPage from './pages/AppointmentDetailPage/AppointmentDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -31,6 +32,7 @@ const App: React.FC = () => {
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/my-info" element={<MyInfoPage />} />
           <Route path="/doctor-support" element={<DoctorSupportPage />} />
+          <Route path="/appointment-details" element={<AppointmentDetailPage />} />
           {/* Add more routes here */}
         </Routes>
       </div>
