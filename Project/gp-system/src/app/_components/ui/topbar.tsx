@@ -28,12 +28,6 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                             Schedule
                         </Link>
                         <Link
-                            href="/dashboard/patient-records"
-                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
-                        >
-                            Patient records
-                        </Link>
-                        <Link
                             href="/dashboard/support"
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
                         >

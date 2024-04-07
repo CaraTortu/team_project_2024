@@ -84,18 +84,22 @@ export default function GetAppointmentPage() {
                                         </span>
                                         : {appointment.details}
                                     </p>
-                                    {pastOrFuture == "past" && (<p className="text-gray-600">
-                                        <span className="font-bold text-gray-800">
-                                            Notes
-                                        </span>
-                                        : {appointment.notes}
-                                    </p>)}
-                                    {pastOrFuture == "past" && (<p className="text-gray-600">
-                                        <span className="font-bold text-gray-800">
-                                            Diagnoses
-                                        </span>
-                                        : {appointment.diagnoses}
-                                    </p>)}
+                                    {pastOrFuture == "past" && (
+                                        <p className="text-gray-600">
+                                            <span className="font-bold text-gray-800">
+                                                Notes
+                                            </span>
+                                            : {appointment.notes}
+                                        </p>
+                                    )}
+                                    {pastOrFuture == "past" && (
+                                        <p className="text-gray-600">
+                                            <span className="font-bold text-gray-800">
+                                                Diagnoses
+                                            </span>
+                                            : {appointment.diagnoses}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                             <div className="flex min-w-32 flex-col items-center justify-center space-y-2">

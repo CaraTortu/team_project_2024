@@ -182,6 +182,24 @@ export const appointmentRouter = createTRPCRouter({
 
             return { success: true, data: freeAppointments };
         }),
+    getPatientPastAppointments: staffProtectedProcedure
+        .input(z.object({ patientId: z.string().min(1) }))
+        .query(async ({ ctx, input }) => {
+            return await ctx.db
+                .select({
+                    date: appointment.appointmentDate,
+                    diagnoses: appointment.diagnoses,
+                    notes: appointment.notes
+                })
+                .from(appointment)
+                .where(
+                    and(
+                        eq(appointment.userId, input.patientId),
+                        eq(appointment.isCancelled, false),
+                        lt(appointment.appointmentDate, new Date()),
+                    ),
+                ).orderBy(appointment.appointmentDate);
+        }),
     createAppointment: protectedProcedure
         .input(
             z.object({
@@ -290,6 +308,10 @@ export const appointmentRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ ctx, input }) => {
+            if (input.day.getDate() < new Date().getDate() || input.day.getMonth() < new Date().getMonth() || input.day.getFullYear() < new Date().getFullYear()) {
+                return { success: false, reason: "You cannot edit appointments from previous days" }
+            }
+
             await ctx.db
                 .update(appointment)
                 .set({ notes: input.notes, diagnoses: input.diagnoses })
@@ -300,5 +322,7 @@ export const appointmentRouter = createTRPCRouter({
                         eq(appointment.appointmentDate, input.day),
                     ),
                 );
+
+                return { success: true }
         }),
 });

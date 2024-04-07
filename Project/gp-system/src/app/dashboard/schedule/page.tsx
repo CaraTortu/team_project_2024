@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { format, addDays } from "date-fns";
 import { api } from "~/trpc/react";
+import toast from "react-hot-toast";
 
 const DoctorDashboardPage: React.FC = () => {
     // Get appointment by date
@@ -9,6 +10,7 @@ const DoctorDashboardPage: React.FC = () => {
     const appointments = api.appointment.getDoctorAppointments.useQuery({
         day: currentDate,
     });
+
     const setNotes = api.appointment.updateNotes.useMutation();
 
     // Selected appointment
@@ -16,6 +18,8 @@ const DoctorDashboardPage: React.FC = () => {
     const [appointmentSelected, setAppointmentSelected] =
         useState<typeof Appointment>(undefined);
 
+    const patientHistory = api.appointment.getPatientPastAppointments.useQuery({ patientId: appointmentSelected?.patientId ?? "1234" })
+    
     // Date helpers
     const goToPreviousDay = () => {
         setCurrentDate(addDays(currentDate, -1));
@@ -25,12 +29,18 @@ const DoctorDashboardPage: React.FC = () => {
     };
 
     const updateValues = async () => {
-        await setNotes.mutateAsync({
+        const result = await setNotes.mutateAsync({
             diagnoses: appointmentSelected?.diagnoses ?? "",
             notes: appointmentSelected?.notes ?? "",
             userID: appointmentSelected?.patientId as string,
             day: appointmentSelected?.appointmentDate as Date,
         });
+
+        if (result.success) {
+            toast.success("Data saved successfully");
+        } else {
+            toast.error(result.reason ?? "Something went wrong")
+        }
     };
 
     return (
@@ -92,31 +102,102 @@ const DoctorDashboardPage: React.FC = () => {
                 </div>
             )}
             {appointmentSelected && (
-                <div className="flex flex-grow gap-4 p-4">
-                    <div className="flex flex-col gap-2">
-                        <p>Notes:</p>
-                        <textarea
-                            value={appointmentSelected.notes ?? ""}
-                            onChange={(e) =>
-                                setAppointmentSelected({
-                                    ...appointmentSelected,
-                                    notes: e.target.value,
-                                })
-                            }
-                        ></textarea>
-                        <p>Diagnosis:</p>
-                        <textarea
-                            value={appointmentSelected.diagnoses ?? ""}
-                            onChange={(e) =>
-                                setAppointmentSelected({
-                                    ...appointmentSelected,
-                                    diagnoses: e.target.value,
-                                })
-                            }
-                        ></textarea>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <button onClick={updateValues}>update values</button>
+                <div className="container mx-auto p-4">
+                    <h1 className="mb-6 text-2xl font-bold">
+                        Appointment Details - {appointmentSelected.patientName}
+                    </h1>
+
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            updateValues();
+                        }}
+                        className="mb-4"
+                    >
+                        <div className="mb-4">
+                            <label
+                                htmlFor="notes"
+                                className="mb-1 block text-sm font-medium text-gray-700"
+                            >
+                                Notes:
+                            </label>
+                            <textarea
+                                id="notes"
+                                rows={5}
+                                className="mt-1 block w-full resize-none rounded-md border border-gray-300 p-2 shadow-sm sm:text-sm" // Increased padding here
+                                value={appointmentSelected.notes ?? ""}
+                                onChange={(e) =>
+                                    setAppointmentSelected({
+                                        ...appointmentSelected,
+                                        notes: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label
+                                htmlFor="diagnosis"
+                                className="mb-1 block text-sm font-medium text-gray-700"
+                            >
+                                Diagnosis:
+                            </label>
+                            <input
+                                id="diagnosis"
+                                type="text"
+                                className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm sm:text-sm" // Increased padding here
+                                value={appointmentSelected.diagnoses ?? ""}
+                                onChange={(e) =>
+                                    setAppointmentSelected({
+                                        ...appointmentSelected,
+                                        diagnoses: e.target.value,
+                                    })
+                                }
+                            />
+                        </div>
+
+                        <div className="flex gap-2">
+                        <button
+                            type="submit"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                        >
+                            Save Appointment Details
+                        </button>
+<button
+                            onClick={() => {updateValues(); setAppointmentSelected(undefined)}}
+                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                        >
+                            Go back
+                        </button>
+                        </div>
+                    </form>
+
+                    <div>
+                        <h2 className="mb-4 text-xl font-semibold">
+                            Past Appointment History
+                        </h2>
+                        {patientHistory.isSuccess && patientHistory.data.length > 0 ? (
+                            patientHistory.data.map(entry => (
+                                <div
+                                    key={entry.date.getTime()}
+                                    className="mb-3 rounded-lg bg-gray-100 p-4"
+                                >
+                                    <p>
+                                        <strong>Date:</strong>{" "}
+                                        {entry.date.toDateString()}
+                                    </p>
+                                    <p>
+                                        <strong>Notes:</strong> {entry.notes}
+                                    </p>
+                                    <p>
+                                        <strong>Diagnosis:</strong>{" "}
+                                        {entry.diagnoses}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No past appointments found.</p>
+                        )}
                     </div>
                 </div>
             )}
