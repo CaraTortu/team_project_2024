@@ -1,16 +1,19 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
 import { getServerAuthSession } from "~/server/auth";
 import { db } from "~/server/db";
+import Stripe from "stripe";
+import { env } from "~/env";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
     const session = await getServerAuthSession();
+    const stripe = new Stripe(env.STRIPE_SK);
 
     return {
         db,
         session,
+        stripe,
         ...opts,
     };
 };

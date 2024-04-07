@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
@@ -8,8 +9,10 @@ export default function GetAppointmentPage() {
     let upcomingAppointments = api.appointment.getAppointments.useQuery({
         pastOrFuture,
     });
-    const cancel_appointment = api.appointment.cancelAppointment.useMutation();
 
+    const router = useRouter();
+
+    const cancel_appointment = api.appointment.cancelAppointment.useMutation();
     const cancelAppointment = async (appointmentDate: Date) => {
         const res = await cancel_appointment.mutateAsync({
             appointDate: appointmentDate,
@@ -23,6 +26,12 @@ export default function GetAppointmentPage() {
             toast.error(res.reason);
             return;
         }
+    };
+
+    const sendToPayment = async (appointmentId: number) => {
+        toast.success("Redirecting you to payment...");
+        await new Promise((s) => setTimeout(s, 500));
+        router.push(`/dashboard/checkout/${appointmentId}`);
     };
 
     return (
@@ -118,9 +127,7 @@ export default function GetAppointmentPage() {
                                 {appointment.paymentStatus != "complete" && (
                                     <button
                                         onClick={() =>
-                                            toast.success(
-                                                "Redirecting you to payment...",
-                                            )
+                                            sendToPayment(appointment.id)
                                         }
                                         className="mt-2 w-full rounded-lg bg-blue-400 px-4 py-1 text-white duration-300 hover:bg-blue-500 hover:shadow-xl"
                                     >

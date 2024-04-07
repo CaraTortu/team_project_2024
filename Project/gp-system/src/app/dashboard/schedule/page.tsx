@@ -18,8 +18,10 @@ const DoctorDashboardPage: React.FC = () => {
     const [appointmentSelected, setAppointmentSelected] =
         useState<typeof Appointment>(undefined);
 
-    const patientHistory = api.appointment.getPatientPastAppointments.useQuery({ patientId: appointmentSelected?.patientId ?? "1234" })
-    
+    const patientHistory = api.appointment.getPatientPastAppointments.useQuery({
+        patientId: appointmentSelected?.patientId ?? "1234",
+    });
+
     // Date helpers
     const goToPreviousDay = () => {
         setCurrentDate(addDays(currentDate, -1));
@@ -39,7 +41,7 @@ const DoctorDashboardPage: React.FC = () => {
         if (result.success) {
             toast.success("Data saved successfully");
         } else {
-            toast.error(result.reason ?? "Something went wrong")
+            toast.error(result.reason ?? "Something went wrong");
         }
     };
 
@@ -103,8 +105,10 @@ const DoctorDashboardPage: React.FC = () => {
             )}
             {appointmentSelected && (
                 <div className="container mx-auto p-4">
-                    <h1 className="mb-6 text-2xl font-bold">
-                        Appointment Details - {appointmentSelected.patientName}
+                    <h1 className="mb-6 font-serif text-xl font-semibold text-gray-700">
+                        Appointment Details{" "}
+                        <span className="font-bold text-black">-</span>{" "}
+                        {appointmentSelected.patientName}
                     </h1>
 
                     <form
@@ -157,18 +161,21 @@ const DoctorDashboardPage: React.FC = () => {
                         </div>
 
                         <div className="flex gap-2">
-                        <button
-                            type="submit"
-                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
-                        >
-                            Save Appointment Details
-                        </button>
-<button
-                            onClick={() => {updateValues(); setAppointmentSelected(undefined)}}
-                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
-                        >
-                            Go back
-                        </button>
+                            <button
+                                type="submit"
+                                className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                            >
+                                Save Appointment Details
+                            </button>
+                            <button
+                                onClick={() => {
+                                    updateValues();
+                                    setAppointmentSelected(undefined);
+                                }}
+                                className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                            >
+                                Go back
+                            </button>
                         </div>
                     </form>
 
@@ -176,8 +183,9 @@ const DoctorDashboardPage: React.FC = () => {
                         <h2 className="mb-4 text-xl font-semibold">
                             Past Appointment History
                         </h2>
-                        {patientHistory.isSuccess && patientHistory.data.length > 0 ? (
-                            patientHistory.data.map(entry => (
+                        {patientHistory.isSuccess &&
+                        patientHistory.data.length > 0 ? (
+                            patientHistory.data.map((entry) => (
                                 <div
                                     key={entry.date.getTime()}
                                     className="mb-3 rounded-lg bg-gray-100 p-4"

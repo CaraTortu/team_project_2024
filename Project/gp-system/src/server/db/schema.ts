@@ -3,6 +3,7 @@ import {
     boolean,
     index,
     integer,
+    json,
     pgEnum,
     pgTableCreator,
     primaryKey,
@@ -138,6 +139,7 @@ export const appointment = createTable(
         details: varchar("details", { length: 512 }),
         paymentAmount: real("paymentAmount"),
         paymentStatus: paymentStatus("paymentStatus").default("pending"),
+        checkoutSession: json("checkoutSession"),
         isCancelled: boolean("isCancelled").default(false),
         createdAt: timestamp("created_at")
             .default(sql`CURRENT_TIMESTAMP`)
