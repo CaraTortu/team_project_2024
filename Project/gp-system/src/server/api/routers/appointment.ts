@@ -189,7 +189,7 @@ export const appointmentRouter = createTRPCRouter({
                 .select({
                     date: appointment.appointmentDate,
                     diagnoses: appointment.diagnoses,
-                    notes: appointment.notes
+                    notes: appointment.notes,
                 })
                 .from(appointment)
                 .where(
@@ -198,7 +198,8 @@ export const appointmentRouter = createTRPCRouter({
                         eq(appointment.isCancelled, false),
                         lt(appointment.appointmentDate, new Date()),
                     ),
-                ).orderBy(appointment.appointmentDate);
+                )
+                .orderBy(appointment.appointmentDate);
         }),
     createAppointment: protectedProcedure
         .input(
@@ -308,8 +309,15 @@ export const appointmentRouter = createTRPCRouter({
             }),
         )
         .mutation(async ({ ctx, input }) => {
-            if (input.day.getDate() < new Date().getDate() || input.day.getMonth() < new Date().getMonth() || input.day.getFullYear() < new Date().getFullYear()) {
-                return { success: false, reason: "You cannot edit appointments from previous days" }
+            if (
+                input.day.getDate() < new Date().getDate() ||
+                input.day.getMonth() < new Date().getMonth() ||
+                input.day.getFullYear() < new Date().getFullYear()
+            ) {
+                return {
+                    success: false,
+                    reason: "You cannot edit appointments from previous days",
+                };
             }
 
             await ctx.db
@@ -323,6 +331,6 @@ export const appointmentRouter = createTRPCRouter({
                     ),
                 );
 
-                return { success: true }
+            return { success: true };
         }),
 });
