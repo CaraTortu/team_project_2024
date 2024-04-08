@@ -88,7 +88,7 @@ const DoctorDashboardPage: React.FC = () => {
                                     </span>
 
                                     <span className="text-sm text-gray-600">
-                                        Patient ID: {appointment.patientId}
+                                        Patient ID: {appointment.patientId!.length < 20 ? appointment.patientId : appointment.patientId?.substring(0, 20)+"..."}
                                     </span>
                                     <span className="text-sm text-gray-600">
                                         Problem: {appointment.details}
