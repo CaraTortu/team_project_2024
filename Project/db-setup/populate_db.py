@@ -63,7 +63,6 @@ def random_string(len: int):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(len))
 
-
 def random_password(len: int):
     password = random_string(len)
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()

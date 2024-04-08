@@ -32,7 +32,7 @@ export const userRouter = createTRPCRouter({
             }
 
             await ctx.db.insert(users).values({
-                id: randomString(255),
+                id: randomString(16),
                 title: input.title,
                 firstName: input.fname,
                 lastName: input.lname,
