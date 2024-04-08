@@ -20,7 +20,9 @@ async function CreateCheckout({
 }
 
 async function ShowStatus({ params }: { params: { checkoutid: string[] } }) {
-    const status = await api.payment.getCheckoutStatus.query({ checkoutId: params.checkoutid[1] ?? "" })
+    const status = await api.payment.getCheckoutStatus.query({
+        checkoutId: params.checkoutid[1] ?? "",
+    });
 
     return <div>Status for {status.session?.status}</div>;
 }

@@ -65,7 +65,6 @@ export const paymentRouter = createTRPCRouter({
                                 name:
                                     "Gp appointment at " +
                                     appointment_selected.appointmentDate.toUTCString(),
-                                
                             },
                             unit_amount:
                                 appointment_selected.paymentAmount * 100,
@@ -75,7 +74,7 @@ export const paymentRouter = createTRPCRouter({
                 ],
                 mode: "payment",
                 metadata: {
-                    appointmentId 
+                    appointmentId,
                 },
                 automatic_tax: {
                     enabled: true,
@@ -83,10 +82,11 @@ export const paymentRouter = createTRPCRouter({
                 return_url: `${env.NEXTAUTH_URL}/dashboard/checkout/${appointment_selected.id}/{CHECKOUT_SESSION_ID}`,
             });
 
-            await db.update(appointment)
-                    .set({ checkoutSession: payment_session })
-                    .where(eq(appointment.id, appointmentId));
-            
+            await db
+                .update(appointment)
+                .set({ checkoutSession: payment_session })
+                .where(eq(appointment.id, appointmentId));
+
             return {
                 success: true,
                 clientSecret: payment_session.client_secret,
@@ -95,19 +95,32 @@ export const paymentRouter = createTRPCRouter({
     getCheckoutStatus: protectedProcedure
         .input(z.object({ checkoutId: z.string() }))
         .query(async ({ ctx: { db, stripe }, input }) => {
-            const sess = await stripe.checkout.sessions.retrieve(input.checkoutId);
-            const appointmentId = z.object({ appointmentId: z.string() }).safeParse(sess.metadata)
-            
+            const sess = await stripe.checkout.sessions.retrieve(
+                input.checkoutId,
+            );
+            const appointmentId = z
+                .object({ appointmentId: z.string() })
+                .safeParse(sess.metadata);
+
             if (!appointmentId.success) {
-                return { success: false, reason: "Something went wrong on our end." }
-            }
-        
-            if (sess.status == "complete") {
-                await db.update(appointment)
-                    .set({ paymentStatus: "complete", checkoutSession: sess })
-                    .where(eq(appointment.id, Number(appointmentId.data.appointmentId)))
+                return {
+                    success: false,
+                    reason: "Something went wrong on our end.",
+                };
             }
 
-            return { success: true, session: sess }
+            if (sess.status == "complete") {
+                await db
+                    .update(appointment)
+                    .set({ paymentStatus: "complete", checkoutSession: sess })
+                    .where(
+                        eq(
+                            appointment.id,
+                            Number(appointmentId.data.appointmentId),
+                        ),
+                    );
+            }
+
+            return { success: true, session: sess };
         }),
 });

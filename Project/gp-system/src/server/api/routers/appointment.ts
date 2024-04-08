@@ -183,8 +183,12 @@ export const appointmentRouter = createTRPCRouter({
             return { success: true, data: freeAppointments };
         }),
     getPatientPastAppointments: staffProtectedProcedure
-        .input(z.object({ patientId: z.string().min(1) }))
+        .input(z.object({ patientId: z.string().optional().nullish() }))
         .query(async ({ ctx, input }) => {
+            if (!input.patientId) {
+                return null;
+            }
+
             return await ctx.db
                 .select({
                     date: appointment.appointmentDate,

@@ -8,8 +8,9 @@ const DoctorDashboardPage: React.FC = () => {
     // Get appointment by date
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const appointments = api.appointment.getDoctorAppointments.useQuery({
-        day: currentDate,
-    });
+            day: currentDate,
+        })
+    
 
     const setNotes = api.appointment.updateNotes.useMutation();
 
@@ -19,7 +20,7 @@ const DoctorDashboardPage: React.FC = () => {
         useState<typeof Appointment>(undefined);
 
     const patientHistory = api.appointment.getPatientPastAppointments.useQuery({
-        patientId: appointmentSelected?.patientId ?? "1234",
+        patientId: appointmentSelected?.patientId,
     });
 
     // Date helpers
@@ -114,6 +115,7 @@ const DoctorDashboardPage: React.FC = () => {
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
+                            appointments.refetch()
                             updateValues();
                         }}
                         className="mb-4"
@@ -170,6 +172,7 @@ const DoctorDashboardPage: React.FC = () => {
                             <button
                                 onClick={() => {
                                     updateValues();
+                                    appointments.refetch()
                                     setAppointmentSelected(undefined);
                                 }}
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
@@ -183,7 +186,8 @@ const DoctorDashboardPage: React.FC = () => {
                         <h2 className="mb-4 text-xl font-semibold">
                             Past Appointment History
                         </h2>
-                        {patientHistory.isSuccess &&
+                        {patientHistory &&
+                        patientHistory.data &&
                         patientHistory.data.length > 0 ? (
                             patientHistory.data.map((entry) => (
                                 <div
