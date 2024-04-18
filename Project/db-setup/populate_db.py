@@ -124,7 +124,7 @@ def create_appointments(doctor_ids, user_ids):
 def create_clinics() -> int:
     CLINIC_QUERY = 'INSERT INTO public."gp-system_clinic" (address, name, latitude, longitude) VALUES(%s, %s, %s, %s)'
 
-    clinic_address = lambda: str(random.randint(1,100)) + " Avenue St. " + random.choice([])
+    clinic_address = lambda: str(random.randint(1,100)) + " Avenue St. " + random.choice(["a", "b", "c", "d"])
     names = ["Ballyrain", "Cork clinic", "Galway clinic", "Dublin clinic", "Sligo clinic"]
     lat  = [ 54.953977,  51.893651,  53.2724040,  53.3413612,  54.2712946 ] 
     long = [-7.7084102, -8.4699587, -9.06456773, -6.28390382, -8.48407431 ]
