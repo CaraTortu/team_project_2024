@@ -242,7 +242,7 @@ export const appointmentRouter = createTRPCRouter({
                 where: eq(users.id, input.doctorId),
             });
 
-            if (!doctor) {
+            if (!doctor?.clinic_id) {
                 return { success: false, reason: "Invalid doctor ID" };
             }
 
@@ -273,6 +273,7 @@ export const appointmentRouter = createTRPCRouter({
                             : patientId,
                     appointmentDate: input.appointmentDate,
                     paymentAmount: 60,
+                    clinicId: doctor.clinic_id
                 })
                 .execute();
 

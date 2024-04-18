@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { CiLogin } from "react-icons/ci";
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import { signOut } from "next-auth/react";
 
 const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {

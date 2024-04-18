@@ -1,9 +1,10 @@
 "use client";
 import React, { Suspense, useState } from "react";
-import { format, addDays, isBefore, isToday } from "date-fns";
+import { format } from "date-fns";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
+import { Calendar } from "~/app/_components/calendar";
 
 const ClinicSelector = dynamic(
     () => import("~/app/_components/clinicselector"),
@@ -20,19 +21,16 @@ const BookAppointment: React.FC<{
     clinicSelected: ClinicFormat;
     setClinic: React.Dispatch<React.SetStateAction<ClinicFormat | null>>;
 }> = ({ clinicSelected, setClinic }) => {
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+        new Date(),
+    );
+    const [selectedDoctor, setSelectedDoctor] = useState<string>("");
 
     let availableAppointments =
         api.appointment.getAvailableAppointments.useQuery({
-            day: selectedDate,
+            day: selectedDate!,
             clinic_id: clinicSelected.id,
         }).data;
-
-    const weekDays: Date[] = [];
-
-    for (let i = 0; i < 7; i++) {
-        weekDays.push(addDays(selectedDate, i - 3));
-    }
 
     const [selectedSlotId, setSelectedSlotId] = useState<{
         time: Date;
@@ -44,22 +42,6 @@ const BookAppointment: React.FC<{
 
     const make_booking = api.appointment.createAppointment.useMutation();
 
-    // Navigation functions for week
-    const goToPreviousWeek = () => {
-        setSelectedDate(
-            addDays(selectedDate, -7) < new Date()
-                ? new Date()
-                : addDays(selectedDate, -7),
-        );
-        setSelectedSlotId(null);
-    };
-
-    const goToNextWeek = () => {
-        setSelectedDate(addDays(selectedDate, 7));
-        setSelectedSlotId(null);
-    };
-
-    // Function to confirm the booking
     const confirmBooking = async () => {
         if (!selectedSlotId || !selectedDate || !availableAppointments) return;
 
@@ -79,137 +61,123 @@ const BookAppointment: React.FC<{
             return;
         }
 
-        // Here you would also typically send a confirmation to the backend.
         toast.success("Appointment booked successfully!");
 
-        // Clear the selected slot and provide any further confirmation needed.
         setSelectedSlotId(null);
 
         availableAppointments = {
             success: availableAppointments.success,
             data: availableAppointments.data!.map((appointment) => {
-                if (appointment.doctor_id == selectedSlotId.doctor_id) {
-                    appointment.available_appointments =
-                        appointment.available_appointments.map((item) => ({
-                            ...item,
-                            free:
-                                item.time == selectedSlotId.time
-                                    ? false
-                                    : item.free,
-                        }));
-                }
+                if (appointment.doctor_id != selectedSlotId.doctor_id)
+                    return appointment;
 
+                appointment.available_appointments =
+                    appointment.available_appointments.map((item) => ({
+                        ...item,
+                        free: item.free
+                            ? !(item.time == selectedSlotId.time)
+                            : false,
+                    }));
                 return appointment;
             }),
         };
     };
 
     return (
-        <div className="flex flex-grow flex-col px-4">
-            <div className="mb-8 flex items-center justify-between gap-2">
-                <button
-                    onClick={goToPreviousWeek}
-                    className="px-4 py-2 text-xl disabled:opacity-0"
-                    disabled={addDays(selectedDate, -3) <= new Date()}
-                >
-                    &larr;
-                </button>
-                {weekDays.map((day) => (
-                    <button
-                        key={day.getTime()}
-                        disabled={
-                            (isBefore(day, new Date()) && !isToday(day)) ||
-                            [0, 6].includes(day.getDay())
+        <div className="flex w-screen flex-grow flex-col items-center">
+            <p className="text-2xl font-bold">
+                Select an appointment for {clinicSelected.name}
+            </p>
+            <div className="grid w-[80%] flex-grow grid-cols-3 grid-rows-1 place-items-center px-4">
+                <div className="flex aspect-square size-fit flex-col items-center justify-center rounded-xl border border-blue-600 bg-blue-200 py-2">
+                    <Calendar
+                        takenDays={[]}
+                        selectedDay={selectedDate}
+                        setSelectedDay={setSelectedDate}
+                    />
+                    <select
+                        className="mx-6 w-2/3 rounded-lg bg-white px-2 py-1"
+                        onChange={(e) =>
+                            setSelectedDoctor(e.currentTarget.value)
                         }
-                        onClick={() => {
-                            setSelectedDate(day);
-                            setSelectedSlotId(null);
-                        }}
-                        className={`rounded-lg px-4 py-2 duration-300 ${
-                            (isBefore(day, new Date()) && !isToday(day)) ||
-                            [0, 6].includes(day.getDay())
-                                ? "cursor-not-allowed bg-gray-300"
-                                : selectedDate.toDateString() ===
-                                    day.toDateString()
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-blue-200 hover:bg-blue-300"
-                        }`}
+                        value={selectedDoctor}
                     >
-                        {format(day, "EEE dd MMM")}
-                    </button>
-                ))}
-                <button onClick={goToNextWeek} className="px-4 py-2 text-xl">
-                    &rarr;
-                </button>
-            </div>
-            <div className="flex flex-row justify-center gap-2 duration-300">
-                {availableAppointments?.data?.length && (
-                    <div className="flex items-center">
-                        <button
-                            onClick={() => setClinic(null)}
-                            className="rounded-lg border-2 border-blue-400 bg-white px-2 py-1 text-blue-400 duration-300 hover:bg-blue-500 hover:text-white"
-                        >
-                            {"<- "}Select another clinic
-                        </button>
-                    </div>
-                )}
+                        <option value="" disabled>
+                            Select a doctor
+                        </option>
+                        {availableAppointments?.data?.map((doctor) => (
+                            <option value={doctor.doctor_name!}>
+                                Dr. {doctor.doctor_name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="flex w-full gap-2 text-center duration-300">
+                    {!availableAppointments?.data && (
+                        <p className="w-full text-3xl">Loading...</p>
+                    )}
+                    {availableAppointments?.data?.length == 0 && (
+                        <p className="w-full text-3xl">
+                            No appointments available for this day!
+                        </p>
+                    )}
+                    {availableAppointments?.data
+                        ?.filter(
+                            (doctor) => doctor.doctor_name == selectedDoctor,
+                        )
+                        .map((doctor) => (
+                            <div
+                                key={doctor.doctor_id}
+                                className="flex w-full flex-col gap-1"
+                            >
+                                {doctor.available_appointments.map((slot) => {
+                                    const slotClassName =
+                                        getSlotClassName(slot);
 
-                {availableAppointments?.data?.length == 0 && (
-                    <p className="mt-24 w-full text-center text-3xl">
-                        No appointments available for this day!
-                    </p>
-                )}
-                {availableAppointments?.data?.map((doctor) => (
-                    <div
-                        key={doctor.doctor_id}
-                        className="flex max-w-fit flex-grow flex-col gap-2"
-                    >
-                        {doctor.available_appointments.map((slot) => {
-                            const slotClassName = getSlotClassName(slot);
+                                    function getSlotClassName(slot: {
+                                        time: Date;
+                                        free: boolean;
+                                    }): string {
+                                        if (!slot.free) {
+                                            return "bg-red-200 cursor-not-allowed";
+                                        }
 
-                            function getSlotClassName(slot: {
-                                time: Date;
-                                free: boolean;
-                            }): string {
-                                if (!slot.free) {
-                                    return "disabled:bg-red-200 cursor-not-allowed";
-                                }
-
-                                if (
-                                    slot.time == selectedSlotId?.time &&
-                                    doctor.doctor_id ==
-                                        selectedSlotId?.doctor_id
-                                ) {
-                                    return "bg-blue-300";
-                                } else {
-                                    return "bg-green-400 bg-opacity-35 hover:bg-opacity-70";
-                                }
-                            }
-
-                            return (
-                                <button
-                                    key={slot.time.getTime().toString()}
-                                    className={`flex gap-2 rounded-lg border p-2 text-left text-sm duration-300 ${slotClassName}`}
-                                    onClick={() =>
-                                        setSelectedSlotId({
-                                            time: slot.time,
-                                            doctor_id: doctor.doctor_id,
-                                            doctor_name:
-                                                doctor.doctor_name ?? "",
-                                        })
+                                        if (
+                                            slot.time == selectedSlotId?.time &&
+                                            doctor.doctor_id ==
+                                                selectedSlotId?.doctor_id
+                                        ) {
+                                            return "bg-blue-300";
+                                        }
+                                        return "bg-green-400 bg-opacity-35 hover:bg-opacity-70";
                                     }
-                                    disabled={!slot.free}
-                                >
-                                    {format(slot.time, "hh:mm")}
-                                    <p>-</p>
-                                    {doctor.doctor_name}
-                                </button>
-                            );
-                        })}
-                    </div>
-                ))}
+
+                                    return (
+                                        <button
+                                            key={slot.time.getTime().toString()}
+                                            className={`flex w-full justify-center gap-2 rounded-md border p-2 text-lg duration-300 ${slotClassName}`}
+                                            onClick={() =>
+                                                setSelectedSlotId({
+                                                    time: slot.time,
+                                                    doctor_id: doctor.doctor_id,
+                                                    doctor_name:
+                                                        doctor.doctor_name ??
+                                                        "",
+                                                })
+                                            }
+                                            disabled={!slot.free}
+                                        >
+                                            {format(slot.time, "hh:mm")}
+                                            <p>- Dr.</p>
+                                            {doctor.doctor_name}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        ))}
+                </div>
                 {selectedSlotId && (
-                    <div className="flex flex-col justify-center gap-2 p-4 pl-12 text-black">
+                    <div className="flex flex-col justify-center gap-2 p-4 text-black">
                         <p className="text-2xl font-bold">
                             Appointment information
                         </p>

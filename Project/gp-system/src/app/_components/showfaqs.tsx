@@ -5,7 +5,7 @@ import { useState } from "react";
 const SupportPageFAQS: React.FC<{
     faqs: { question: string; answer: string }[];
 }> = ({ faqs }) => {
-    const [openFAQs, setOpenFAQs] = useState<{ [key: number]: boolean }>({});
+    const [openFAQs, setOpenFAQs] = useState<Record<number, boolean>>({});
 
     const toggleFAQ = (index: number) => {
         setOpenFAQs((prevOpenFAQs) => ({

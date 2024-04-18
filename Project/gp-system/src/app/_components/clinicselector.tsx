@@ -7,7 +7,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { LatLngExpression, Map } from "leaflet";
+import { type LatLngExpression, type Map } from "leaflet";
 
 interface ClinicFormat {
     id: number;
@@ -23,8 +23,8 @@ const ClinicSelector: React.FC<{
 
     const centerIcon = (clinic: any) => {
         const coordinates: LatLngExpression = [
-            Number(clinic.lat),
-            Number(clinic.long),
+            Number(clinic.latitude),
+            Number(clinic.longitude),
         ];
         mapRef?.setView(coordinates, 14);
         mapRef?.eachLayer((L) => {
@@ -45,14 +45,17 @@ const ClinicSelector: React.FC<{
             {clinics.isLoading && <p>Loading...</p>}
             {clinics.isSuccess && (
                 <div className="ml-2 flex gap-4">
-                    <div className="grid w-80 grid-flow-row grid-cols-1">
+                    <div className="grid w-80 grid-flow-row h-[80vh] grid-cols-1 place-content-center space-y-4 rounded-lg">
                         {clinics.data.map((clinic) => (
                             <div
                                 key={clinic.id}
-                                onClick={() => centerIcon(clinic)}
-                                className="w-full border border-black"
+                                className="flex flex-col w-full rounded-lg border-2 border-blue-600 bg-blue-200 px-4 py-2 text-black gap-4"
                             >
-                                {clinic.name}
+                                <p className="font-bold text-lg">{clinic.name} - <span className="italic font-semibold text-gray-500 text-sm">You've been here {clinic.appointments.filter(app => !app.isCancelled).length} times</span></p>
+                                <div className="flex-grow gap-2 flex items-end ">
+                                    <button role="button" className="px-2 py-1 bg-blue-100 rounded-lg hover:bg-blue-500 hover:text-white hover:shadow-xl duration-300" onClick={() => centerIcon(clinic)}>Zoom in</button>
+                                    <button role="button" className="px-2 py-1 bg-blue-100 rounded-lg hover:bg-blue-500 hover:text-white hover:shadow-xl duration-300" onClick={() => setClinic(clinic)}>Select this clinic</button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -69,8 +72,8 @@ const ClinicSelector: React.FC<{
                             <Marker
                                 key={clinic.id}
                                 position={[
-                                    Number(clinic.lat),
-                                    Number(clinic.long),
+                                    Number(clinic.latitude),
+                                    Number(clinic.longitude),
                                 ]}
                             >
                                 <Popup

@@ -110,7 +110,7 @@ export const paymentRouter = createTRPCRouter({
                 };
             }
 
-            let payment_status: "complete" | "pending" =
+            const payment_status: "complete" | "pending" =
                 sess.status == "complete" ? "complete" : "pending";
             const appointment_details = await db
                 .update(appointment)

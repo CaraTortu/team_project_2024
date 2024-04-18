@@ -141,14 +141,13 @@ def create_clinics() -> int:
 
 DOCTORS = 20
 PATIENTS = 10
-APPOINTMENTS = 10
 CLINICS = create_clinics()
 
 create_initial_users_for_testing()
 doctor_ids = [create_doctor(random.randint(1, CLINICS)) for _ in range(DOCTORS)]
 user_ids = [create_user() for _ in range(PATIENTS)]
 
-[create_appointments(doctor_ids, user_ids) for _ in range(APPOINTMENTS)]
+# [create_appointments(doctor_ids, user_ids) for _ in range(APPOINTMENTS)]
 
 print("Random data successfully inserted into the database.")
 

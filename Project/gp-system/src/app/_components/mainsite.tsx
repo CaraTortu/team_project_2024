@@ -12,7 +12,7 @@ import {
     MdAccountCircle,
 } from "react-icons/md";
 import { FaStethoscope, FaNotesMedical } from "react-icons/fa";
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 
 const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
     const services = [

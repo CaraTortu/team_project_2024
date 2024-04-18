@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { Roboto } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Toaster } from "react-hot-toast";
+import { Chat } from "./_components/chatbot";
 
 const roboto = Roboto({
     subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
             <body className={`select-none font-sans ${roboto.variable}`}>
                 <TRPCReactProvider>
                     <Toaster position="top-center" />
+                    <Chat />
                     {children}
                 </TRPCReactProvider>
             </body>

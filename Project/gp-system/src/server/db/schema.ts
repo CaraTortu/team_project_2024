@@ -146,10 +146,14 @@ export const appointment = createTable(
             .notNull(),
         diagnoses: varchar("diagnoses", { length: 2048 }).default(""),
         notes: varchar("doctorNotes", { length: 16384 }).default(""),
+        clinicId: integer("clinicId")
+            .references(() => clinic.id)
+            .notNull()
     },
     (appointment) => ({
         userIdIdx: index("appointment_userId_idx").on(appointment.userId),
         doctorIdIdx: index("appointment_doctorId_idx").on(appointment.doctorId),
+        clinicIdIdx: index("appointment_clinicId_idx").on(clinic.id),
     }),
 );
 
@@ -164,6 +168,11 @@ export const appointmentRelations = relations(appointment, ({ one }) => ({
         fields: [appointment.doctorId],
         references: [users.id],
     }),
+    clinic: one(clinic, {
+        relationName: "clinic",
+        fields: [appointment.clinicId],
+        references: [clinic.id]
+    })
 }));
 
 export const clinic = createTable("clinic", {
@@ -176,4 +185,5 @@ export const clinic = createTable("clinic", {
 
 export const clinicRelations = relations(clinic, ({ many }) => ({
     doctors: many(users, { relationName: "doctors" }),
+    appointments: many(appointment, { relationName: "clinic" })
 }));

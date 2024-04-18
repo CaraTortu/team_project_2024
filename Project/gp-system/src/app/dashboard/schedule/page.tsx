@@ -34,8 +34,8 @@ const DoctorDashboardPage: React.FC = () => {
         const result = await setNotes.mutateAsync({
             diagnoses: appointmentSelected?.diagnoses ?? "",
             notes: appointmentSelected?.notes ?? "",
-            userID: appointmentSelected?.patientId as string,
-            day: appointmentSelected?.appointmentDate as Date,
+            userID: appointmentSelected?.patientId!,
+            day: appointmentSelected?.appointmentDate!,
         });
 
         if (result.success) {

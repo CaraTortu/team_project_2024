@@ -1,6 +1,6 @@
 "use client";
 
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import React from "react";
 
 const MyInfoPage: React.FC<{ session: Session }> = ({ session }) => {

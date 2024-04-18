@@ -6,7 +6,7 @@ import { api } from "~/trpc/react";
 
 export default function GetAppointmentPage() {
     const [pastOrFuture, setPastOrFuture] = useState("future");
-    let upcomingAppointments = api.appointment.getAppointments.useQuery({
+    const upcomingAppointments = api.appointment.getAppointments.useQuery({
         pastOrFuture,
     });
 
@@ -62,7 +62,7 @@ export default function GetAppointmentPage() {
                         </p>
                     )}
                 {upcomingAppointments.isSuccess &&
-                    upcomingAppointments.data!.map((appointment) => (
+                    upcomingAppointments.data.map((appointment) => (
                         <div
                             key={appointment.id}
                             className="mb-4 flex justify-between gap-2 rounded-lg bg-slate-200 p-4 shadow-xl"
@@ -70,7 +70,7 @@ export default function GetAppointmentPage() {
                             <div className="flex items-center justify-between break-words">
                                 <div>
                                     <p className="text-xl font-bold text-black">
-                                        {appointment.doctorName}
+                                        Dr. {appointment.doctorName}
                                     </p>
                                     <p className="font-bold text-gray-600">
                                         {appointment.appointmentDate.toLocaleString()}
