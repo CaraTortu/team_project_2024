@@ -58,7 +58,6 @@ def create_initial_users_for_testing():
         """, (user_id, title, first_name, last_name, full_name, email, email_verified, password, image, "user"))
 
 
-
 def random_string(len: int):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for _ in range(len))
@@ -122,24 +121,28 @@ def create_appointments(doctor_ids, user_ids):
             VALUES ('No details', %s, %s, %s, %s, 60);
         """, (doctor_id, user_id, appointment_date, created_by))
 
-def create_clinic():
-    clinic_address = str(random.randint(1,100))
-    clinic_address += " Avenue St. "
-    clinic_address += random.choice(["lorem", "ipsum", "dolor", "sit", "amet", "eunans", "hello"])
-    name = random.choice(["Ballyrain", "LkGP", "loremIp", "ClinicForAll"])
-    lat = str(54.953729 + (random.random()-0.5)/5)
-    long = str(-7.708638 + (random.random()-0.5)/5)
+def create_clinics() -> int:
+    CLINIC_QUERY = 'INSERT INTO public."gp-system_clinic" (address, name, latitude, longitude) VALUES(%s, %s, %s, %s)'
 
-    with conn.cursor() as cursor:
-        cursor.execute("""
-        INSERT INTO public."gp-system_clinic" (address, name, latitude, longitude) VALUES(%s, %s, %s, %s);
-                       """, (clinic_address, name, lat, long))
+    clinic_address = lambda: str(random.randint(1,100)) + " Avenue St. " + random.choice([])
+    names = ["Ballyrain", "Cork clinic", "Galway clinic", "Dublin clinic", "Sligo clinic"]
+    lat  = [ 54.953977,  51.893651,  53.2724040,  53.3413612,  54.2712946 ] 
+    long = [-7.7084102, -8.4699587, -9.06456773, -6.28390382, -8.48407431 ]
+    
+    assert len(lat) == len(long) == len(names)
 
-CLINICS = 30
+    cursor = conn.cursor()
+    for i in range(len(names)): 
+        cursor.execute(CLINIC_QUERY, (clinic_address(), names[i], lat[i], long[i]))
+    
+    cursor.close()
+    return len(names)
+
+
 DOCTORS = 100
-PATIENTS = 250
-APPOINTMENTS = 50
-[create_clinic() for _ in range(CLINICS)]
+PATIENTS = 10
+APPOINTMENTS = 10
+CLINICS = create_clinics()
 
 create_initial_users_for_testing()
 doctor_ids = [create_doctor(random.randint(1, CLINICS)) for _ in range(DOCTORS)]

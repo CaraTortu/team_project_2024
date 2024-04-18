@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { appointment } from "~/server/db/schema";
+import { appointment, users } from "~/server/db/schema";
 
 export const paymentRouter = createTRPCRouter({
     createCheckoutSession: protectedProcedure
@@ -98,6 +98,7 @@ export const paymentRouter = createTRPCRouter({
             const sess = await stripe.checkout.sessions.retrieve(
                 input.checkoutId,
             );
+
             const appointmentId = z
                 .object({ appointmentId: z.string() })
                 .safeParse(sess.metadata);
@@ -109,18 +110,37 @@ export const paymentRouter = createTRPCRouter({
                 };
             }
 
-            if (sess.status == "complete") {
-                await db
-                    .update(appointment)
-                    .set({ paymentStatus: "complete", checkoutSession: sess })
-                    .where(
-                        eq(
-                            appointment.id,
-                            Number(appointmentId.data.appointmentId),
-                        ),
-                    );
+            let payment_status: "complete" | "pending" =
+                sess.status == "complete" ? "complete" : "pending";
+            const appointment_details = await db
+                .update(appointment)
+                .set({ paymentStatus: payment_status, checkoutSession: sess })
+                .where(
+                    eq(
+                        appointment.id,
+                        Number(appointmentId.data.appointmentId),
+                    ),
+                )
+                .returning();
+
+            if (appointment_details.length == 0) {
+                return { success: false, reason: "How did this happen?" };
             }
 
-            return { success: true, session: sess };
+            const f_appointment = appointment_details[0]!;
+            const doctor_name = await db
+                .select({ name: users.name })
+                .from(users)
+                .where(eq(users.id, f_appointment.doctorId));
+
+            return {
+                success: true,
+                session: sess,
+                appointment: {
+                    id: f_appointment.id,
+                    doctorName: doctor_name[0]?.name,
+                    appointmentDate: f_appointment.appointmentDate,
+                },
+            };
         }),
 });

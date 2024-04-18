@@ -39,8 +39,13 @@ const MyInfoPage: React.FC<{ session: Session }> = ({ session }) => {
                             <label className="block text-sm font-medium text-gray-700">
                                 User ID
                             </label>
-                            <div className="mt-1 rounded bg-gray-100 p-2 overflow-hidden">
-                                {userInfo.employeeNumber!.length < 20 ? userInfo.employeeNumber : userInfo.employeeNumber?.substring(0, 20)+"..."}
+                            <div className="mt-1 overflow-hidden rounded bg-gray-100 p-2">
+                                {userInfo.employeeNumber!.length < 20
+                                    ? userInfo.employeeNumber
+                                    : userInfo.employeeNumber?.substring(
+                                          0,
+                                          20,
+                                      ) + "..."}
                             </div>
                         </div>
                         <div className="mb-4">

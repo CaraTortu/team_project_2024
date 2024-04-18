@@ -8,9 +8,8 @@ const DoctorDashboardPage: React.FC = () => {
     // Get appointment by date
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const appointments = api.appointment.getDoctorAppointments.useQuery({
-            day: currentDate,
-        })
-    
+        day: currentDate,
+    });
 
     const setNotes = api.appointment.updateNotes.useMutation();
 
@@ -88,7 +87,13 @@ const DoctorDashboardPage: React.FC = () => {
                                     </span>
 
                                     <span className="text-sm text-gray-600">
-                                        Patient ID: {appointment.patientId!.length < 20 ? appointment.patientId : appointment.patientId?.substring(0, 20)+"..."}
+                                        Patient ID:{" "}
+                                        {appointment.patientId!.length < 20
+                                            ? appointment.patientId
+                                            : appointment.patientId?.substring(
+                                                  0,
+                                                  20,
+                                              ) + "..."}
                                     </span>
                                     <span className="text-sm text-gray-600">
                                         Problem: {appointment.details}
@@ -115,7 +120,7 @@ const DoctorDashboardPage: React.FC = () => {
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            appointments.refetch()
+                            appointments.refetch();
                             updateValues();
                         }}
                         className="mb-4"
@@ -172,7 +177,7 @@ const DoctorDashboardPage: React.FC = () => {
                             <button
                                 onClick={() => {
                                     updateValues();
-                                    appointments.refetch()
+                                    appointments.refetch();
                                     setAppointmentSelected(undefined);
                                 }}
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"

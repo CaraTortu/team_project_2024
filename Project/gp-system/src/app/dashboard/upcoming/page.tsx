@@ -93,22 +93,31 @@ export default function GetAppointmentPage() {
                                         </span>
                                         : {appointment.details}
                                     </p>
-                                    {pastOrFuture == "past" && (
-                                        <p className="text-gray-600">
-                                            <span className="font-bold text-gray-800">
-                                                Notes
+                                    {pastOrFuture == "past" &&
+                                        appointment.notes && (
+                                            <p className="text-gray-600">
+                                                <span className="font-bold text-gray-800">
+                                                    Notes
+                                                </span>
+                                                : {appointment.notes}
+                                            </p>
+                                        )}
+                                    {pastOrFuture == "past" &&
+                                        appointment.diagnoses && (
+                                            <p className="text-gray-600">
+                                                <span className="font-bold text-gray-800">
+                                                    Diagnoses
+                                                </span>
+                                                : {appointment.diagnoses}
+                                            </p>
+                                        )}
+                                    {!appointment.diagnoses &&
+                                        !appointment.notes && (
+                                            <span className="font-bold text-gray-500">
+                                                There are no notes for this
+                                                appointment
                                             </span>
-                                            : {appointment.notes}
-                                        </p>
-                                    )}
-                                    {pastOrFuture == "past" && (
-                                        <p className="text-gray-600">
-                                            <span className="font-bold text-gray-800">
-                                                Diagnoses
-                                            </span>
-                                            : {appointment.diagnoses}
-                                        </p>
-                                    )}
+                                        )}
                                 </div>
                             </div>
                             <div className="flex min-w-32 flex-col items-center justify-center space-y-2">

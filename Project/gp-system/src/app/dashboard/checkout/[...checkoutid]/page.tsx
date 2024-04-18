@@ -2,6 +2,7 @@ import React from "react";
 import { api } from "~/trpc/server";
 import { redirect } from "next/navigation";
 import { Checkout } from "~/app/_components/checkout";
+import { ShowStatus } from "~/app/_components/showstatus";
 
 async function CreateCheckout({
     params,
@@ -17,14 +18,6 @@ async function CreateCheckout({
     }
 
     return <Checkout clientSecret={res.clientSecret} />;
-}
-
-async function ShowStatus({ params }: { params: { checkoutid: string[] } }) {
-    const status = await api.payment.getCheckoutStatus.query({
-        checkoutId: params.checkoutid[1] ?? "",
-    });
-
-    return <div>Status for {status.session?.status}</div>;
 }
 
 export default async function Page({

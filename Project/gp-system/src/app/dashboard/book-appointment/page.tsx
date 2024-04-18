@@ -142,7 +142,7 @@ const BookAppointment: React.FC<{
                     &rarr;
                 </button>
             </div>
-            <div className="flex justify-center gap-6 duration-300">
+            <div className="flex flex-row justify-center gap-2 duration-300">
                 {availableAppointments?.data?.length && (
                     <div className="flex items-center">
                         <button
@@ -172,7 +172,7 @@ const BookAppointment: React.FC<{
                                 free: boolean;
                             }): string {
                                 if (!slot.free) {
-                                    return "disabled:bg-gray-300 cursor-not-allowed";
+                                    return "disabled:bg-red-200 cursor-not-allowed";
                                 }
 
                                 if (
@@ -180,9 +180,9 @@ const BookAppointment: React.FC<{
                                     doctor.doctor_id ==
                                         selectedSlotId?.doctor_id
                                 ) {
-                                    return "bg-green-300";
+                                    return "bg-blue-300";
                                 } else {
-                                    return "bg-blue-400 bg-opacity-35 hover:bg-opacity-70";
+                                    return "bg-green-400 bg-opacity-35 hover:bg-opacity-70";
                                 }
                             }
 

@@ -12,6 +12,9 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                 src="/logo.png"
                 className="ml-4 h-12 w-12 rounded-full shadow-lg"
             ></img>
+            <p className="ml-2 text-lg font-semibold text-black">
+                ClinicsUnited
+            </p>
             <div className="ml-8 flex h-full items-center font-bold text-white">
                 {session && session.user?.userType == "doctor" && (
                     <div className="text-md flex gap-x-8 text-blue-400 text-opacity-80">

@@ -10,7 +10,9 @@ export default async function RootLayout({
     return (
         <div>
             <TopBar session={await getServerAuthSession()} />
-            <main className="pt-20">{children}</main>
+            <main className="flex h-full min-h-screen flex-col pt-20">
+                {children}
+            </main>
         </div>
     );
 }
