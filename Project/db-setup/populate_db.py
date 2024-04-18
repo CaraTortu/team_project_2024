@@ -139,7 +139,7 @@ def create_clinics() -> int:
     return len(names)
 
 
-DOCTORS = 100
+DOCTORS = 20
 PATIENTS = 10
 APPOINTMENTS = 10
 CLINICS = create_clinics()
