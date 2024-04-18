@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { api } from "~/trpc/react";
 
 // Leaflet stuff
@@ -7,7 +7,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { Map } from "leaflet";
+import { LatLngExpression, Map } from "leaflet";
 
 interface ClinicFormat {
     id: number;
@@ -21,18 +21,35 @@ const ClinicSelector: React.FC<{
     const clinics = api.clinic.getClinics.useQuery();
     const [mapRef, setMapRef] = useState<Map | null>(null);
 
+    const centerIcon = (clinic: any) => {
+        const coordinates: LatLngExpression = [
+            Number(clinic.lat),
+            Number(clinic.long),
+        ];
+        mapRef?.setView(coordinates, 14);
+        mapRef?.eachLayer((L) => {
+            const layer_coordinates = L.getPopup()?.getLatLng();
+            if (!layer_coordinates) return;
+
+            if (
+                layer_coordinates.lat == coordinates[0] &&
+                layer_coordinates.lng == coordinates[1]
+            ) {
+                L.openPopup();
+            }
+        });
+    };
+
     return (
         <>
             {clinics.isLoading && <p>Loading...</p>}
             {clinics.isSuccess && (
-                <div className="flex gap-4 ml-2">
-                    <div className="w-80 grid grid-cols-1 grid-flow-row">
-                        {clinics.data.map(clinic => (
+                <div className="ml-2 flex gap-4">
+                    <div className="grid w-80 grid-flow-row grid-cols-1">
+                        {clinics.data.map((clinic) => (
                             <div
                                 key={clinic.id}
-                                onClick={() => {
-                                    mapRef?.setView([Number(clinic.lat), Number(clinic.long)]);
-                                }}
+                                onClick={() => centerIcon(clinic)}
                                 className="w-full border border-black"
                             >
                                 {clinic.name}
@@ -41,13 +58,11 @@ const ClinicSelector: React.FC<{
                     </div>
                     <MapContainer
                         ref={(ref) => setMapRef(ref)}
-                        center={[53.56667000, -7.766670]}
+                        center={[53.56667, -7.76667]}
                         zoom={7}
-                        zoomControl={false}
                         scrollWheelZoom={false}
                         markerZoomAnimation={true}
-                        dragging={false}
-                        className="fixed right-0 w-[calc(100vw-21.5rem)] h-[88vh] flex-grow"
+                        className="fixed right-2 h-[88vh] w-[calc(100vw-21.5rem)] flex-grow rounded-xl"
                     >
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                         {clinics.data.map((clinic) => (
@@ -58,7 +73,10 @@ const ClinicSelector: React.FC<{
                                     Number(clinic.long),
                                 ]}
                             >
-                                <Popup className="flex flex-col">
+                                <Popup
+                                    className="flex flex-col"
+                                    closeButton={false}
+                                >
                                     <p>Name: {clinic.name}</p>
                                     <p>Address: {clinic.address}</p>
                                     <button
