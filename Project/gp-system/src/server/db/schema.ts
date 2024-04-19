@@ -148,7 +148,7 @@ export const appointment = createTable(
         notes: varchar("doctorNotes", { length: 16384 }).default(""),
         clinicId: integer("clinicId")
             .references(() => clinic.id)
-            .notNull()
+            .notNull(),
     },
     (appointment) => ({
         userIdIdx: index("appointment_userId_idx").on(appointment.userId),
@@ -171,8 +171,8 @@ export const appointmentRelations = relations(appointment, ({ one }) => ({
     clinic: one(clinic, {
         relationName: "clinic",
         fields: [appointment.clinicId],
-        references: [clinic.id]
-    })
+        references: [clinic.id],
+    }),
 }));
 
 export const clinic = createTable("clinic", {
@@ -185,5 +185,5 @@ export const clinic = createTable("clinic", {
 
 export const clinicRelations = relations(clinic, ({ many }) => ({
     doctors: many(users, { relationName: "doctors" }),
-    appointments: many(appointment, { relationName: "clinic" })
+    appointments: many(appointment, { relationName: "clinic" }),
 }));

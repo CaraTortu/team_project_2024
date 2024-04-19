@@ -273,7 +273,7 @@ export const appointmentRouter = createTRPCRouter({
                             : patientId,
                     appointmentDate: input.appointmentDate,
                     paymentAmount: 60,
-                    clinicId: doctor.clinic_id
+                    clinicId: doctor.clinic_id,
                 })
                 .execute();
 

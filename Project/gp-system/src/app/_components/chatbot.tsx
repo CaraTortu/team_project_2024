@@ -1,5 +1,12 @@
 "use client";
-import { Children, type ReactElement, cloneElement, useState } from "react";
+import {
+    Children,
+    type ReactElement,
+    cloneElement,
+    useState,
+    useEffect,
+    useRef,
+} from "react";
 import Chatbot, { createChatBotMessage } from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import { FaRobot } from "react-icons/fa";
@@ -9,15 +16,32 @@ interface Actions {
     handleMessage: (message: string) => void;
 }
 
+function useTimeout(callback: () => void, delay: number) {
+    const timeoutRef = useRef<number | undefined>(undefined);
+    const savedCallback = useRef(callback);
+    useEffect(() => {
+        savedCallback.current = callback;
+    }, [callback]);
+    useEffect(() => {
+        const tick = () => savedCallback.current();
+        timeoutRef.current = window.setTimeout(tick, delay);
+        return () => window.clearTimeout(timeoutRef.current);
+    }, [delay]);
+    return timeoutRef;
+}
+
 export const Chat = () => {
     const [showChat, setShowChat] = useState(false);
+    const [beenOpened, setBeenOpened] = useState(true);
     const getResponse = api.chat.getResponse.useMutation();
     const initial_messages = [createChatBotMessage("Hello there!", {})];
+
+    useTimeout(() => setBeenOpened(false), 5000);
 
     const ActionProvider = ({
         children,
         setState,
-        state
+        state,
     }: {
         children: ReactElement;
         setState: any;
@@ -35,7 +59,13 @@ export const Chat = () => {
             setState((prev: { messages: typeof initial_messages }) => {
                 return {
                     ...prev,
-                    messages: [...prev.messages, createChatBotMessage(botMessage.choices[0]?.message.content ?? "", {})],
+                    messages: [
+                        ...prev.messages,
+                        createChatBotMessage(
+                            botMessage.choices[0]?.message.content ?? "",
+                            {},
+                        ),
+                    ],
                 };
             });
         };
@@ -87,10 +117,21 @@ export const Chat = () => {
                 />
             </div>
 
-            <div onClick={() => setShowChat(!showChat)}>
+            <div
+                onClick={() => {
+                    setShowChat(!showChat);
+                    setBeenOpened(true);
+                }}
+                className="relative"
+            >
+                {!beenOpened && (
+                    <p className="fixed bottom-12 right-2 z-20 rounded-full bg-red-500 px-1 text-white">
+                        1
+                    </p>
+                )}
                 <FaRobot
                     size="3.5rem"
-                    className="rounded-full bg-black p-2"
+                    className="rounded-full bg-black p-2 duration-300 hover:bg-gray-800"
                     color="white"
                 />
             </div>

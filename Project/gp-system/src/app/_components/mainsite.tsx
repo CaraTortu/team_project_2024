@@ -20,7 +20,7 @@ const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
             icon: <MdEventAvailable className="mx-auto mb-4 text-6xl" />,
             title: "Appointment Scheduling",
             description:
-                "Patients and front desk staff can effortlessly schedule, follow up, and manage doctor appointments.",
+                "Patients and doctors can effortlessly schedule appointment at any of our clinics",
         },
         {
             icon: <MdHistory className="mx-auto mb-4 text-6xl" />,
@@ -29,22 +29,10 @@ const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
                 "Access comprehensive past medical histories through our app or website, ensuring informed healthcare decisions.",
         },
         {
-            icon: <MdPayment className="mx-auto mb-4 text-6xl" />,
-            title: "Payment and Billing",
-            description:
-                "Get transparent payment estimations, access billing details, and view complete payment statistics.",
-        },
-        {
             icon: <FaStethoscope className="mx-auto mb-4 text-6xl" />,
             title: "Daily Schedule for Doctors",
             description:
                 "Doctors can view and manage their daily schedules, ensuring an organized and efficient workflow.",
-        },
-        {
-            icon: <MdLocalPharmacy className="mx-auto mb-4 text-6xl" />,
-            title: "Pharmacy Locator",
-            description:
-                "Patients can find the nearest pharmacies, ensuring they have quick access to their medications.",
         },
         {
             icon: <MdQuestionAnswer className="mx-auto mb-4 text-6xl" />,
@@ -56,7 +44,7 @@ const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
             icon: <MdAccountCircle className="mx-auto mb-4 text-6xl" />,
             title: "Easy Account Creation",
             description:
-                "Outsiders can create an account using their PPS number and email, seamlessly joining the system.",
+                "New users can create an account using their email, seamlessly joining the system.",
         },
         {
             icon: <MdDescription className="mx-auto mb-4 text-6xl" />,
@@ -76,9 +64,9 @@ const MainPage: React.FC<{ session: Session | null }> = ({ session }) => {
         <div className="">
             <TopBar session={session} />
 
-            <header className="flex h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-100 to-white text-center">
+            <header className="relative flex h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-100 to-white text-center">
                 <h1 className="mb-4 text-5xl font-bold">
-                    Welcome to the GP Appointment System
+                    Welcome to the Clinics united appointment system
                 </h1>
                 <p className="mb-4 text-xl font-light">
                     Your health, our priority. Manage your medical appointments

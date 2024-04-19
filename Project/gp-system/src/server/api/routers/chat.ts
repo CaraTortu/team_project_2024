@@ -16,7 +16,7 @@ const initial_prompt = `
     After logging in and clicking on "Book an appointment", you will be shown a list of clinics we support. Click on the one of your choice, select
     a day in the calendar shown to the left, select a time slot and provide a reason for why you need this appointment. After this, click "Submit" and
     a new appointment will have been made
-    `
+    `;
 
 export const chatRouter = createTRPCRouter({
     getResponse: publicProcedure
@@ -33,9 +33,10 @@ export const chatRouter = createTRPCRouter({
         )
         .mutation(async ({ input }) => {
             return await openai.chat.completions.create({
-                messages: [{ role: "system", content: initial_prompt },
-                ...input.messages,
-                { role: "user", content: input.query },
+                messages: [
+                    { role: "system", content: initial_prompt },
+                    ...input.messages,
+                    { role: "user", content: input.query },
                 ],
                 model: "gpt-3.5-turbo",
             });

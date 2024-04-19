@@ -45,16 +45,39 @@ const ClinicSelector: React.FC<{
             {clinics.isLoading && <p>Loading...</p>}
             {clinics.isSuccess && (
                 <div className="ml-2 flex gap-4">
-                    <div className="grid w-80 grid-flow-row h-[80vh] grid-cols-1 place-content-center space-y-4 rounded-lg">
+                    <div className="grid h-[80vh] w-80 grid-flow-row grid-cols-1 place-content-center space-y-4 rounded-lg">
                         {clinics.data.map((clinic) => (
                             <div
                                 key={clinic.id}
-                                className="flex flex-col w-full rounded-lg border-2 border-blue-600 bg-blue-200 px-4 py-2 text-black gap-4"
+                                className="flex w-full flex-col gap-4 rounded-lg border-2 border-blue-600 bg-blue-200 px-4 py-2 text-black"
                             >
-                                <p className="font-bold text-lg">{clinic.name} - <span className="italic font-semibold text-gray-500 text-sm">You've been here {clinic.appointments.filter(app => !app.isCancelled).length} times</span></p>
-                                <div className="flex-grow gap-2 flex items-end ">
-                                    <button role="button" className="px-2 py-1 bg-blue-100 rounded-lg hover:bg-blue-500 hover:text-white hover:shadow-xl duration-300" onClick={() => centerIcon(clinic)}>Zoom in</button>
-                                    <button role="button" className="px-2 py-1 bg-blue-100 rounded-lg hover:bg-blue-500 hover:text-white hover:shadow-xl duration-300" onClick={() => setClinic(clinic)}>Select this clinic</button>
+                                <p className="text-lg font-bold">
+                                    {clinic.name} -{" "}
+                                    <span className="text-sm font-semibold italic text-gray-500">
+                                        You've been here{" "}
+                                        {
+                                            clinic.appointments.filter(
+                                                (app) => !app.isCancelled,
+                                            ).length
+                                        }{" "}
+                                        times
+                                    </span>
+                                </p>
+                                <div className="flex flex-grow items-end gap-2 ">
+                                    <button
+                                        role="button"
+                                        className="rounded-lg bg-blue-100 px-2 py-1 duration-300 hover:bg-blue-500 hover:text-white hover:shadow-xl"
+                                        onClick={() => centerIcon(clinic)}
+                                    >
+                                        Zoom in
+                                    </button>
+                                    <button
+                                        role="button"
+                                        className="rounded-lg bg-blue-100 px-2 py-1 duration-300 hover:bg-blue-500 hover:text-white hover:shadow-xl"
+                                        onClick={() => setClinic(clinic)}
+                                    >
+                                        Select this clinic
+                                    </button>
                                 </div>
                             </div>
                         ))}
