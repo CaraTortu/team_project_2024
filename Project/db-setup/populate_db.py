@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 import random
 import string
 from dotenv import dotenv_values
-from datetime import datetime
+from datetime import date, datetime
 import bcrypt
 import requests
 
@@ -122,7 +122,7 @@ def create_appointments(doctor_ids, user_ids):
         """, (doctor_id, user_id, appointment_date, created_by))
 
 def create_clinics() -> int:
-    CLINIC_QUERY = 'INSERT INTO public."gp-system_clinic" (address, name, latitude, longitude) VALUES(%s, %s, %s, %s)'
+    CLINIC_QUERY = 'INSERT INTO public."gp-system_clinic" (address, name, latitude, longitude, "openingTime", "closingTime") VALUES(%s, %s, %s, %s, %s, %s)'
 
     clinic_address = lambda: str(random.randint(1,100)) + " Avenue St. " + random.choice(["a", "b", "c", "d"])
     names = ["Ballyrain", "Cork clinic", "Galway clinic", "Dublin clinic", "Sligo clinic"]
@@ -133,7 +133,7 @@ def create_clinics() -> int:
 
     cursor = conn.cursor()
     for i in range(len(names)): 
-        cursor.execute(CLINIC_QUERY, (clinic_address(), names[i], lat[i], long[i]))
+        cursor.execute(CLINIC_QUERY, (clinic_address(), names[i], lat[i], long[i], datetime(1970, 1, 1, 8, 0, 0, 0), datetime(1970, 1, 1, 16, 0, 0, 0)))
     
     cursor.close()
     return len(names)

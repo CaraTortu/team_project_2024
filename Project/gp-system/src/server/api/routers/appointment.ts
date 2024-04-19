@@ -7,7 +7,7 @@ import {
     staffProtectedProcedure,
 } from "~/server/api/trpc";
 import { db } from "~/server/db";
-import { appointment, users } from "~/server/db/schema";
+import { appointment, clinic, users } from "~/server/db/schema";
 
 export const appointmentRouter = createTRPCRouter({
     getAppointments: protectedProcedure
@@ -138,17 +138,23 @@ export const appointmentRouter = createTRPCRouter({
                 },
             });
 
+            // Get clinic opening hours
+            const clinic_data = await db.query.clinic.findFirst({
+                where: eq(clinic.id, input.clinic_id)
+            })
+
+            // Start Time
             const latestDate = new Date(
                 input.day.getFullYear(),
                 input.day.getMonth(),
                 input.day.getDate(),
-                9,
+                clinic_data?.openingTime?.getHours() ?? 9,
                 0,
                 0,
             );
 
-            // TODO: retrieve the latest time each person will work.
-            endDate.setHours(14);
+            // End time
+            endDate.setHours(clinic_data?.closingTime?.getHours() ?? 14)
             endDate.setDate(endDate.getDate() - 1);
             const availableAppointments: Date[] = [];
 

@@ -86,17 +86,17 @@ const BookAppointment: React.FC<{
     return (
         <div className="flex w-screen flex-grow flex-col items-center">
             <p className="text-2xl font-bold">
-                Select an appointment for {clinicSelected.name}
+                Select an appointment for {clinicSelected.name} {selectedDoctor != "" ? "with Dr. " + selectedDoctor : ""}
             </p>
-            <div className="grid w-[80%] flex-grow grid-cols-3 grid-rows-1 place-items-center px-4">
-                <div className="flex aspect-square size-fit flex-col items-center justify-center rounded-xl border border-blue-600 bg-blue-200 py-2">
+            <div className="relative w-[80%] flex-grow px-4 py-6">
+                <div className="z-40 fixed top-14 bottom-0 m-auto flex aspect-square size-fit flex-col items-center justify-center rounded-xl border border-blue-600 bg-blue-200 py-2">
                     <Calendar
                         takenDays={[]}
                         selectedDay={selectedDate}
                         setSelectedDay={setSelectedDate}
                     />
                     <select
-                        className="mx-6 w-2/3 rounded-lg bg-white px-2 py-1"
+                        className="mx-6 w-2/3 rounded-lg bg-white px-2 py-1 z-[41]"
                         onChange={(e) =>
                             setSelectedDoctor(e.currentTarget.value)
                         }
@@ -112,7 +112,7 @@ const BookAppointment: React.FC<{
                         ))}
                     </select>
                 </div>
-                <div className="flex w-full gap-2 text-center duration-300">
+                <div className="relative flex w-full gap-2 text-center duration-300 z-30">
                     {!availableAppointments?.data && (
                         <p className="w-full text-3xl">Loading...</p>
                     )}
@@ -128,7 +128,7 @@ const BookAppointment: React.FC<{
                         .map((doctor) => (
                             <div
                                 key={doctor.doctor_id}
-                                className="flex w-full flex-col gap-1"
+                                className="flex w-full flex-col items-center gap-1"
                             >
                                 {doctor.available_appointments.map((slot) => {
                                     const slotClassName =
@@ -145,7 +145,7 @@ const BookAppointment: React.FC<{
                                         if (
                                             slot.time == selectedSlotId?.time &&
                                             doctor.doctor_id ==
-                                                selectedSlotId?.doctor_id
+                                            selectedSlotId?.doctor_id
                                         ) {
                                             return "bg-blue-300";
                                         }
@@ -155,7 +155,7 @@ const BookAppointment: React.FC<{
                                     return (
                                         <button
                                             key={slot.time.getTime().toString()}
-                                            className={`flex w-full justify-center gap-2 rounded-md border p-2 text-lg duration-300 ${slotClassName}`}
+                                            className={`flex w-[40%] justify-center gap-2 rounded-md border p-2 text-lg duration-300 ${slotClassName}`}
                                             onClick={() =>
                                                 setSelectedSlotId({
                                                     time: slot.time,
@@ -167,9 +167,9 @@ const BookAppointment: React.FC<{
                                             }
                                             disabled={!slot.free}
                                         >
-                                            {format(slot.time, "hh:mm")}
-                                            <p>- Dr.</p>
-                                            {doctor.doctor_name}
+                                            {format(slot.time, "HH:mm")}
+                                            <p>-</p>
+                                            {slot.free ? "Free" : "Taken"}
                                         </button>
                                     );
                                 })}
@@ -177,7 +177,7 @@ const BookAppointment: React.FC<{
                         ))}
                 </div>
                 {selectedSlotId && (
-                    <div className="flex flex-col justify-center gap-2 p-4 text-black">
+                    <div className="fixed z-40 right-[10%] top-14 bottom-0 m-auto flex flex-col justify-center gap-2 p-4 text-black">
                         <p className="text-2xl font-bold">
                             Appointment information
                         </p>
@@ -204,7 +204,7 @@ const BookAppointment: React.FC<{
                                 <span className="font-bold text-gray-700">
                                     Date
                                 </span>
-                                : {selectedSlotId.time.toUTCString()}
+                                : {format(selectedSlotId.time, "MMMM do yyyy HH:mm")}
                             </p>
                         </div>
                         <div className="mt-12 flex flex-col gap-2">

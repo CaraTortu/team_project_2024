@@ -181,6 +181,8 @@ export const clinic = createTable("clinic", {
     latitude: varchar("latitude", { length: 32 }),
     longitude: varchar("longitude", { length: 32 }),
     name: varchar("name").notNull(),
+    openingTime: timestamp("openingTime"),
+    closingTime: timestamp("closingTime")
 });
 
 export const clinicRelations = relations(clinic, ({ many }) => ({
