@@ -114,7 +114,11 @@ export const paymentRouter = createTRPCRouter({
                 sess.status == "complete" ? "complete" : "pending";
             const appointment_details = await db
                 .update(appointment)
-                .set({ paymentStatus: payment_status, checkoutSession: sess })
+                .set({
+                    paymentStatus: payment_status,
+                    checkoutSession: sess,
+                    paidDate: new Date(),
+                })
                 .where(
                     eq(
                         appointment.id,

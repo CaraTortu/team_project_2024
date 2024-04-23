@@ -86,17 +86,18 @@ const BookAppointment: React.FC<{
     return (
         <div className="flex w-screen flex-grow flex-col items-center">
             <p className="text-2xl font-bold">
-                Select an appointment for {clinicSelected.name} {selectedDoctor != "" ? "with Dr. " + selectedDoctor : ""}
+                Select an appointment for {clinicSelected.name}{" "}
+                {selectedDoctor != "" ? "with Dr. " + selectedDoctor : ""}
             </p>
             <div className="relative w-[80%] flex-grow px-4 py-6">
-                <div className="z-40 fixed top-14 bottom-0 m-auto flex aspect-square size-fit flex-col items-center justify-center rounded-xl border border-blue-600 bg-blue-200 py-2">
+                <div className="fixed bottom-0 top-14 z-40 m-auto flex aspect-square size-fit flex-col items-center justify-center rounded-xl border border-blue-600 bg-blue-200 py-2">
                     <Calendar
                         takenDays={[]}
                         selectedDay={selectedDate}
                         setSelectedDay={setSelectedDate}
                     />
                     <select
-                        className="mx-6 w-2/3 rounded-lg bg-white px-2 py-1 z-[41]"
+                        className="z-[41] mx-6 w-2/3 rounded-lg bg-white px-2 py-1"
                         onChange={(e) =>
                             setSelectedDoctor(e.currentTarget.value)
                         }
@@ -112,7 +113,7 @@ const BookAppointment: React.FC<{
                         ))}
                     </select>
                 </div>
-                <div className="relative flex w-full gap-2 text-center duration-300 z-30">
+                <div className="relative z-30 flex w-full gap-2 text-center duration-300">
                     {!availableAppointments?.data && (
                         <p className="w-full text-3xl">Loading...</p>
                     )}
@@ -145,7 +146,7 @@ const BookAppointment: React.FC<{
                                         if (
                                             slot.time == selectedSlotId?.time &&
                                             doctor.doctor_id ==
-                                            selectedSlotId?.doctor_id
+                                                selectedSlotId?.doctor_id
                                         ) {
                                             return "bg-blue-300";
                                         }
@@ -177,7 +178,7 @@ const BookAppointment: React.FC<{
                         ))}
                 </div>
                 {selectedSlotId && (
-                    <div className="fixed z-40 right-[10%] top-14 bottom-0 m-auto flex flex-col justify-center gap-2 p-4 text-black">
+                    <div className="fixed bottom-0 right-[10%] top-14 z-40 m-auto flex flex-col justify-center gap-2 p-4 text-black">
                         <p className="text-2xl font-bold">
                             Appointment information
                         </p>
@@ -204,7 +205,11 @@ const BookAppointment: React.FC<{
                                 <span className="font-bold text-gray-700">
                                     Date
                                 </span>
-                                : {format(selectedSlotId.time, "MMMM do yyyy HH:mm")}
+                                :{" "}
+                                {format(
+                                    selectedSlotId.time,
+                                    "MMMM do yyyy HH:mm",
+                                )}
                             </p>
                         </div>
                         <div className="mt-12 flex flex-col gap-2">

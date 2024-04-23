@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { eq, and, gt, lt, inArray } from "drizzle-orm";
+import { eq, and, gt, lt, inArray, or } from "drizzle-orm";
 import {
     createTRPCRouter,
     protectedProcedure,
@@ -140,8 +140,8 @@ export const appointmentRouter = createTRPCRouter({
 
             // Get clinic opening hours
             const clinic_data = await db.query.clinic.findFirst({
-                where: eq(clinic.id, input.clinic_id)
-            })
+                where: eq(clinic.id, input.clinic_id),
+            });
 
             // Start Time
             const latestDate = new Date(
@@ -154,7 +154,7 @@ export const appointmentRouter = createTRPCRouter({
             );
 
             // End time
-            endDate.setHours(clinic_data?.closingTime?.getHours() ?? 14)
+            endDate.setHours(clinic_data?.closingTime?.getHours() ?? 14);
             endDate.setDate(endDate.getDate() - 1);
             const availableAppointments: Date[] = [];
 
@@ -252,10 +252,19 @@ export const appointmentRouter = createTRPCRouter({
                 return { success: false, reason: "Invalid doctor ID" };
             }
 
-            // TODO: Check the appointment is free
+            const today_end = new Date(input.appointmentDate.getTime());
+            today_end.setHours(23, 59, 59, 999);
+            const today_start = new Date(input.appointmentDate.getTime());
+            today_start.setHours(0, 0, 0, 0);
+
+            console.log();
             const app = await db.query.appointment.findFirst({
                 where: and(
-                    eq(appointment.appointmentDate, input.appointmentDate),
+                    and(
+                        gt(appointment.appointmentDate, today_start),
+                        lt(appointment.appointmentDate, today_end),
+                    ),
+                    eq(appointment.userId, patientId),
                     eq(appointment.isCancelled, false),
                 ),
             });
@@ -263,7 +272,7 @@ export const appointmentRouter = createTRPCRouter({
             if (app !== undefined) {
                 return {
                     success: false,
-                    reason: "You have an appointment booked for this time already",
+                    reason: "You have an appointment booked for this time or day already.",
                 };
             }
 

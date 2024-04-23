@@ -57,6 +57,24 @@ def create_initial_users_for_testing():
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """, (user_id, title, first_name, last_name, full_name, email, email_verified, password, image, "user"))
 
+    user_id = random_id()
+    full_name = random.choice(FIRST_NAMES) + " " + random.choice(LAST_NAMES) 
+    email = f"admin@example.com"
+    password = bcrypt.hashpw("password".encode(), bcrypt.gensalt()).decode()
+    image = f"{full_name.lower().replace(' ', '_')}.jpg"
+    email_verified = datetime.fromtimestamp(random.randint(1583064000, 1709838848)) 
+
+
+    title = random.choice(["Mr", "Ms"])
+    first_name, last_name = full_name.split()
+
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO public."gp-system_user" (id, title, "firstName", "lastName", "fullName", email, "emailVerified", password, image, "userType")
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+        """, (user_id, title, first_name, last_name, full_name, email, email_verified, password, image, "admin"))
+
+
 
 def random_string(len: int):
     characters = string.ascii_letters + string.digits
