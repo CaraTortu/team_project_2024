@@ -64,7 +64,6 @@ export const moneyRouter = createTRPCRouter({
                         }, 0)
                     }, 0),
                     doctor_income: clinic.doctors.map((doctor) => {
-                        console.log(doctor.doctor_appointments)
                         return {
                             doctor: doctor.name,
                             income: doctor.doctor_appointments.reduce((acc, appointment) => {

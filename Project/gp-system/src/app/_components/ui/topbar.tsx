@@ -59,12 +59,6 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                         >
                             Book an appointment
                         </Link>
-                        <Link
-                            href="/dashboard/billing"
-                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
-                        >
-                            Billing
-                        </Link>
                         <button
                             onClick={() => signOut()}
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"

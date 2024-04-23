@@ -257,7 +257,6 @@ export const appointmentRouter = createTRPCRouter({
             const today_start = new Date(input.appointmentDate.getTime());
             today_start.setHours(0, 0, 0, 0);
 
-            console.log();
             const app = await db.query.appointment.findFirst({
                 where: and(
                     and(
