@@ -1,18 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-        // Login first
-    await page.goto('/login');
-    await page.locator('input[name="email"]').fill("doctor@example.com");
-    await page.locator('input[name="password"]').fill("password");
-    // Submit the form
-    await Promise.all([
-        await page.getByRole("button", { name: /Sign in/i }).click(),
-        page.waitForURL("/dashboard/schedule", { timeout: 5000 }), // Wait for navigation after form submission
-    ]);
-    await page.waitForTimeout(2000);
     await page.goto("/dashboard/my-info", { timeout: 5000 });
-
 });
 
 test("should display my info page with relevant info", async ({ page }) => {
@@ -31,7 +20,18 @@ test("should display my info page with relevant info", async ({ page }) => {
 });
 
 test("go to information page as a doctor", async ({ page }) => {
-    await page.getByRole('link', { name: 'My account' }).click();
+   // Login first
+   await page.goto('/login');
+   await page.locator('input[name="email"]').fill("doctor@example.com");
+   await page.locator('input[name="password"]').fill("password");
+   // Submit the form
+   await Promise.all([
+       await page.getByRole("button", { name: /Sign in/i }).click(),
+       page.waitForURL("/dashboard/schedule", { timeout: 5000 }), // Wait for navigation after form submission
+   ]);
+   await page.waitForTimeout(2000);
+   
+   await page.getByRole('link', { name: 'My account' }).click();
 });
 
 test("should logout as a user", async ({ page }) => {
