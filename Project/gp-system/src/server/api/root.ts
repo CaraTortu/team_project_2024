@@ -4,6 +4,7 @@ import { appointmentRouter } from "./routers/appointment";
 import { clinicRouter } from "./routers/clinic";
 import { paymentRouter } from "./routers/payment";
 import { chatRouter } from "./routers/chat";
+import { moneyRouter } from "./routers/money";
 
 export const appRouter = createTRPCRouter({
     user: userRouter,
@@ -11,6 +12,7 @@ export const appRouter = createTRPCRouter({
     clinic: clinicRouter,
     payment: paymentRouter,
     chat: chatRouter,
+    money: moneyRouter,
 });
 
 // export type definition of API

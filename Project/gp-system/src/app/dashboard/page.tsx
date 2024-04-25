@@ -12,5 +12,5 @@ export default async function DashboardPage() {
         redirect("/dashboard/schedule");
     }
 
-    redirect("/dashboard/appointment-search");
+    redirect("/dashboard/stats");
 }

@@ -30,12 +30,6 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                         >
                             Schedule
                         </Link>
-                        <Link
-                            href="/dashboard/support"
-                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
-                        >
-                            Help and support
-                        </Link>
                         <button
                             onClick={() => signOut()}
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
@@ -65,17 +59,27 @@ const TopBar: React.FC<{ session: Session | null }> = ({ session }) => {
                         >
                             Book an appointment
                         </Link>
-                        <Link
-                            href="/dashboard/billing"
+                        <button
+                            onClick={() => signOut()}
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
                         >
-                            Billing
+                            Sign out
+                        </button>
+                    </div>
+                )}
+                {session && session.user?.userType == "admin" && (
+                    <div className="text-md flex gap-x-8 text-blue-400 text-opacity-80">
+                        <Link
+                            href="/dashboard/my-info"
+                            className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
+                        >
+                            My account
                         </Link>
                         <Link
-                            href="/dashboard/support"
+                            href="/dashboard/stats"
                             className="rounded-md bg-opacity-75 px-2 py-1 shadow-none duration-300 hover:bg-blue-400 hover:text-white hover:shadow-lg"
                         >
-                            Help and support
+                            Finances
                         </Link>
                         <button
                             onClick={() => signOut()}

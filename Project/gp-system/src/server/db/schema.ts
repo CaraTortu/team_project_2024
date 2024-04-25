@@ -17,7 +17,7 @@ import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `gp-system_${name}`);
 
-export const userTypeEnum = pgEnum("userType", ["doctor", "frontdesk", "user"]);
+export const userTypeEnum = pgEnum("userType", ["doctor", "admin", "user"]);
 export const paymentStatus = pgEnum("paymentStatus", [
     "complete",
     "failed",
@@ -139,6 +139,7 @@ export const appointment = createTable(
         details: varchar("details", { length: 512 }),
         paymentAmount: real("paymentAmount"),
         paymentStatus: paymentStatus("paymentStatus").default("pending"),
+        paidDate: timestamp("paidDate"),
         checkoutSession: json("checkoutSession"),
         isCancelled: boolean("isCancelled").default(false),
         createdAt: timestamp("created_at")
@@ -182,7 +183,7 @@ export const clinic = createTable("clinic", {
     longitude: varchar("longitude", { length: 32 }),
     name: varchar("name").notNull(),
     openingTime: timestamp("openingTime"),
-    closingTime: timestamp("closingTime")
+    closingTime: timestamp("closingTime"),
 });
 
 export const clinicRelations = relations(clinic, ({ many }) => ({
